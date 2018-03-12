@@ -1,7 +1,6 @@
-"""
- # Data Structures and Algorithms - Part B
- # Created by Reece Benson (16021424)
-"""
+# DADSA - Assignment 1
+# Reece Benson
+
 import traceback
 from functools import partial
 from os import system as call
@@ -266,7 +265,7 @@ class Builder():
         except ValueError:
             # User has entered an invalid value
             return Builder.show_current_menu(True, True, "You have entered an invalid option")
-        except Exception:
+        except Exception as err:
             # Handle other exceptions, and if debugging - show the error and halt the application
             if(Builder._app.debug):
                 print("\nERROR:\nError Handled:\n{0}\n".format(traceback.print_exc()))
@@ -315,3 +314,163 @@ class Builder():
 
             # Get input from user
             Builder.monitor_input()
+
+class Menu():
+    # Define the variables we will be using
+    _app = None
+
+    def __init__(self, app):
+        # Set our Application
+        self._app = app
+
+    def load(self, reloading = False):
+        # Create our Menu
+        Builder.init(self._app, False, reloading)
+
+        ## MAIN
+        Builder.add_menu("main", "Load Season", "load_season")
+        Builder.add_menu("main", "See Developer Information", "info")
+        Builder.add_func("main", "info", lambda: self.dev_info())
+        
+        ## DEBUG INFORMATION
+        if(self._app.debug):
+            Builder.add_menu("main", "See Debug Information", "d_info")
+            Builder.add_func("main", "d_info", lambda: self.debug_info())
+
+        ## LOAD SEASON
+        for season_id in self._app.handler.get_seasons():
+            season = self._app.handler.get_season(season_id)
+
+            # Import Season(s) into our menu
+            Builder.add_menu("load_season", season.name(), "ls_[{0}]".format(season.name()))
+
+            ## LOAD TOURNAMENT
+            for tournament_name in season.tournaments():
+                tournament = season.tournament(tournament_name)
+
+                Builder.add_menu("ls_[{0}]".format(season.name()), tournament_name, "ls_[{0}]_[{1}]".format(season.name(), tournament_name))
+
+                # Import Tournament Options
+                tournament_option_name = "ls_[{0}]_[{1}]".format(season.name(), tournament_name)
+                Builder.add_menu(tournament_option_name, "Emulate Tournament", "{0}_{1}".format(tournament_option_name, "et"))
+                Builder.add_menu(tournament_option_name, "Select Round", "{0}_{1}".format(tournament_option_name, "rs"))
+                Builder.add_menu(tournament_option_name, "Edit Rounds", "{0}_{1}".format(tournament_option_name, "re"))
+                Builder.add_menu(tournament_option_name, "View Difficulty", "{0}_{1}".format(tournament_option_name, "vd"))
+                Builder.add_menu(tournament_option_name, "View Prize Money", "{0}_{1}".format(tournament_option_name, "vpm"))
+                Builder.add_menu(tournament_option_name, "{0} Saving".format("Disable" if tournament.file_saving() else "Enable"), "{0}_{1}".format(tournament_option_name, "fs"))
+
+                # Import Menu Information
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "et"), "Run through every available round on the gender specified")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "rs"), "View information about a specific round")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "re"), "Manage data for a specific round")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vd"), "View the Difficulty for this specific tournament")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "vpm"), "View the Prize Money for this specific tournament")
+                Builder.add_info("{0}_{1}".format(tournament_option_name, "fs"), "Toggle the save state of whether or not to write round data to 'seasons.json'")
+
+                # Import Tournament Functions
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vd"), partial(print, tournament.display("difficulty")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "vpm"), partial(print, tournament.display("prize_money")))
+                Builder.add_func(tournament_option_name, "{0}_{1}".format(tournament_option_name, "fs"), partial(tournament.toggle_file_saving, tournament_option_name))
+
+                ## LOAD ROUNDS
+                for gdr in season.players():
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "et"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "et", gdr))
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "rs"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "rs", gdr))
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "re"), "{0} Rounds".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "re", gdr))
+                    Builder.add_menu("{0}_{1}".format(tournament_option_name, "vlb"), "{0} Leaderboard".format(gdr).title(), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr))
+
+                    ## ADD FUNC FOR LEADERBOARD
+                    Builder.add_func("{0}_{1}".format(tournament_option_name, "et"), "{0}_{1}_{2}".format(tournament_option_name, "et", gdr), partial(tournament.emulate, gdr))
+                    Builder.add_func("{0}_{1}".format(tournament_option_name, "vlb"), "{0}_{1}_{2}".format(tournament_option_name, "vlb", gdr), partial(print, tournament.display("leaderboard", gdr)))
+
+                    ## IMPORT ROUNDS
+                    for r in range(1, (season.settings()["{}_round_count".format(gdr)] + 1)):
+                        # Find our Round
+                        r_str = str(r)
+                        r_name = "round_{0}".format(r)
+                        r_view_round = "{0}_{1}_{2}".format(tournament_option_name, "vr", gdr+"_"+r_name)
+                        rnd = tournament.round(gdr, r_name)
+
+                        # Find our next round if exists
+                        nr_name = "round_{0}".format(r + 1)
+                        n_rnd = tournament.round(gdr, nr_name)
+
+                        # Build Menu
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "rs", gdr), "Round {0}".format(r), r_view_round)
+                        Builder.add_menu("{0}_{1}_{2}".format(tournament_option_name, "re", gdr), "Round {0}".format(r), r_view_round + "_edit")
+
+                        # Functionality Override
+                        funcOverride = False
+                        if(rnd != None and len(rnd.matches()) != rnd.match_cap()):
+                            funcOverride = True
+
+                        # Add Functionality
+                        if(rnd == None or funcOverride):
+                            Builder.add_menu(r_view_round, "Generate Data", "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name))
+                            Builder.add_menu(r_view_round, "Input Data", "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name))
+
+                            # Add Functionality
+                            Builder.add_info("{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), "Generate the data for this round in accordance to previous rounds (if available)")
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_gen".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.generate_round, gdr, r))
+
+                            Builder.add_info("{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), "Manually input the players and scores for this round")
+                            Builder.add_func(r_view_round, "{0}_{1}_{2}_input".format(tournament_option_name, "vr", gdr+"_"+r_name), partial(tournament.input_round, gdr, r))
+                        else:
+                            # Emulate Round
+                            Builder.add_func(r_view_round, r_view_round, partial(tournament.emulate_round, gdr, r_name))
+
+                            # Add Edit Functionality
+                            Builder.add_menu(r_view_round + "_edit", "Edit Scores", r_view_round + "_edit_es")
+                            Builder.add_info(r_view_round + "_edit_es", "Edit Scores on a specific round. Updating a lower round will delete the data for the rounds above it.\n     i.e. Editing Round 3 will delete Round 4 and Round 5 data.")
+                            Builder.add_menu(r_view_round + "_edit", "Clear Scores", r_view_round + "_edit_cs")
+                            Builder.add_info(r_view_round + "_edit_cs", "Clear Scores on a specific round. Updating a lower round will delete the data for the rounds above it.\n     i.e. Clearing Round 3 will also delete Round 4 and Round 5 data.")
+                            Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_es", partial(tournament.edit_round, gdr, r))
+                            Builder.add_func(r_view_round + "_edit", r_view_round + "_edit_cs", partial(tournament.clear_round, gdr, r))
+
+            # Add Overall Rankings into Tournament View
+            Builder.add_menu("ls_[{0}]".format(season.name()), "View Overall Leaderboard", "ls_[{0}]_overall".format(season.name()))
+            Builder.add_func("ls_[{0}]".format(season.name()), "ls_[{0}]_overall".format(season.name()), partial(season.overall_view))
+
+        # Display Menu
+        Builder.show_current_menu()
+
+    def debug_info(self):
+        try:
+            print("What season would you like to debug?")
+            for seasonId in self._app.handler.get_seasons():
+                season = self._app.handler.get_season(seasonId)
+                print("-> {0}".format(season.name()))
+
+            id = input(">>> ") or "season_1"
+            if(self._app.handler.get_season(id) != None):
+                season = self._app.handler.get_season(seasonId)
+                
+                #PRINT DEBUG
+                print("Name: {0}".format(season.name()))
+                for tn in season.tournaments():
+                    t = season.tournament(tn)
+                    print("Name: {}".format(tn))
+                    for g in t.rounds():
+                        for r in t.rounds()[g]:
+                            r = t.round(g, r)
+                            print("------------\n{} {}".format(g, r).title())
+                            print("Match Cap: {}".format(r.match_cap()))
+                            print("Match Count: {}".format(len(r.matches())))
+            else:
+                input("\nError:\nSeason does not exist.\nPress <Return> to continue...")
+        except Exception as err:
+            print(err)
+            input("Continue...")
+        
+    def dev_info(self):
+        # Display Developer Information
+        print("Python - Design and Analysis of Data Structures and Algorithms")
+        print("Assignment 1, due 30th of November 2017")
+        print("")
+        print("This implementation was developed by Reece Benson")
+        print("Student ID: 16021424")
+        print("Student Email: Reece2.Benson@live.uwe.ac.uk")
+        print("")
+        print("The GitHub repository can be found @ http://github.com/reecebenson/DADSA-Tennis (private repo)")
+        print("Thanks!")
+

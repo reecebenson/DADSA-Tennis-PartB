@@ -1,26 +1,25 @@
-"""
- # Data Structures and Algorithms - Part B
- # Created by Reece Benson (16021424)
-"""
-# Imports
-from tennis.Menu import Menu
-from tennis.Game import Game
+# DADSA - Assignment 1
+# Reece Benson
+
+import traceback
+from classes import Menu
+from classes import Handler
 
 class App():
-    # Variables
-    debug = True
+    # Define the variables we will be using
+    debug = False
     menu = None
-    game = None
+    handler = None
 
-    # Entry Point
+    # Define all of the properties we will need to use
     def __init__(self):
         # Load our handler
-        self.game = Game(self)
-        self.game.load()
+        self.handler = Handler.Handler(self)
+        self.handler.load()
 
         # Show Menu
-        #self.menu = Menu(self)
-        #self.menu.load()
+        self.menu = Menu.Menu(self)
+        self.menu.load()
 
         # Hold the program
         self.exit()
