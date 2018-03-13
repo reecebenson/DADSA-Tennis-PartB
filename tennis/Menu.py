@@ -23,7 +23,8 @@ class Menu():
 
         Builder().show_current_menu()
 
-        
+
+"""Start of Menu Builder Class"""        
 class Builder():
     _app = None
     _menu = None

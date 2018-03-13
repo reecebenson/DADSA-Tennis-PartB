@@ -91,7 +91,7 @@
                         },
                         "round_4": {
                             "male": [
-                                {"MP23": 3, "MP02": 0, "winner": "MP13"},
+                                {"MP23": 3, "MP02": 0, "winner": "MP23"},
                                 {"MP13": 2, "MP14": 3, "winner": "MP14"}
                             ],
                             "female": [

@@ -7,18 +7,17 @@ from tennis import Menu
 
 class App():
     # Define the variables we will be using
-    debug = False
     menu = None
     game = None
 
     # Define all of the properties we will need to use
     def __init__(self):
         # Load our Game
-        self.game = Game.Game(self)
+        self.game = Game.Game()
         self.game.load()
 
         # Load our Menu
-        #self.menu = Menu.Menu(self)
+        #self.menu = Menu.Menu(self.game)
         #self.menu.load()
 
         # Hold the program

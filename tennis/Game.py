@@ -4,6 +4,7 @@
 """
 # Imports
 import json
+from os import system as call
 from tennis import Season
 
 # Variables
@@ -11,14 +12,22 @@ gamePath = "./data/json/game.json"
 settingsPath = "./data/json/settings.json"
 
 class Game():
-    game = None
+    debug = True
     seasons = None
+    settings = None
 
-    def __init__(self, game):
-        self.game = game
+    def __init__(self):
+        self.game = self
         self.seasons = { }
+        self.settings = { }
+
+    def clear_screen(self):
+        call("cls")
 
     def load(self):
+        with open(settingsPath) as settings_file:
+            self.settings = json.load(settings_file)
+
         with open(gamePath) as game_file:
             game_data = json.load(game_file)
             seasons = game_data["seasons"]

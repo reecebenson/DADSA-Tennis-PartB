@@ -9,29 +9,33 @@ class Round():
     id = None
     name = None
     game = None
+    parent = None
     json_data = None
     matches = None
+    genders = None
 
-    def __init__(self, _game, _name, _json_data):
+    def __init__(self, _game, _name, _parent, _json_data):
+        self.parent = _parent
         self.name = _name
         self.id = int(_name[-1:])
         self.game = _game
         self.json_data = _json_data
         self.matches = { }
+        self.genders = [ ]
 
         # Read in Gender Round Data
         for gender in _json_data:
             gender_data = _json_data[gender]
-            print(gender)
 
             # Add Gender to Matches
             if(gender not in self.matches):
+                self.genders.append(gender)
                 self.matches.update({ gender: [ ] })
 
             # Read in Round
             for match in gender_data:
                 # Add our Match to the Round Gender
-                self.matches[gender].append(Match.Match(_game, gender, match))
+                self.matches[gender].append(Match.Match(_game, gender, self, match))
 
         if(_game.debug):
             print("[ROUND]: Round '{}' made!".format(self.id))
@@ -39,8 +43,24 @@ class Round():
     def get_name(self):
         return self.name
 
+    def get_genders(self):
+        return self.genders
+
+    def get_id(self):
+        return self.id
+
     def get_matches(self, gender):
         if(gender in self.matches):
             return [ m for m in self.matches[gender] ]
         else:
             return [ ]
+
+    def get_players(self, gender):
+        players = [ ]
+        for m in self.get_matches(gender):
+            players.append(m.player_one)
+            players.append(m.player_two)
+        return players
+
+    def get_winners(self, gender):
+        return [ m.get_winner() for m in self.get_matches(gender) ]
