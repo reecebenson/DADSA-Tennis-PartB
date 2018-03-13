@@ -16,7 +16,7 @@
                     },
                     "rounds": {
                         "round_1": {
-                            "male": [
+                            "male": [ 
                                 {"MP11": 2, "MP01": 3, "winner": "MP01"},
                                 {"MP14": 3, "MP05": 1, "winner": "MP14"},
                                 {"MP19": 0, "MP07": 3, "winner": "MP07"},
@@ -34,7 +34,7 @@
                                 {"MP15": 3, "MP24": 1, "winner": "MP15"},
                                 {"MP21": 0, "MP20": 3, "winner": "MP20"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP24": 1, "FP01": 2, "winner": "FP01"},
                                 {"FP14": 2, "FP05": 1, "winner": "FP14"},
                                 {"FP19": 0, "FP16": 2, "winner": "FP16"},
@@ -54,7 +54,7 @@
                             ]
                         },
                         "round_2": {
-                            "male": [
+                            "male": [ 
                                 {"MP20": 1, "MP01": 3, "winner": "MP01"},
                                 {"MP15": 1, "MP14": 3, "winner": "MP14"},
                                 {"MP07": 3, "MP12": 2, "winner": "MP07"},
@@ -64,11 +64,11 @@
                                 {"MP13": 3, "MP30": 2, "winner": "MP13"},
                                 {"MP03": 3, "MP26": 0, "winner": "MP03"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP01": 2, "FP16": 0, "winner": "FP01"},
                                 {"FP22": 2, "FP14": 1, "winner": "FP22"},
                                 {"FP23": 1, "FP29": 2, "winner": "FP29"},
-                                {"FP18": 2, "FP26": 2, "winner": "dupe"},
+                                {"FP18": 1, "FP26": 2, "winner": "FP26"},
                                 {"FP10": 2, "FP28": 0, "winner": "FP10"},
                                 {"FP13": 2, "FP02": 1, "winner": "FP13"},
                                 {"FP03": 0, "FP07": 2, "winner": "FP07"},
@@ -76,13 +76,13 @@
                             ]
                         },
                         "round_3": {
-                            "male": [
+                            "male": [ 
                                 {"MP03": 2, "MP13": 3, "winner": "MP13"},
-                                {"MP14": 1, "MP01": 2, "winner": "injury"},
+                                {"MP14": 3, "MP01": 2, "winner": "MP14"},
                                 {"MP07": 2, "MP02": 3, "winner": "MP02"},
                                 {"MP23": 3, "MP22": 0, "winner": "MP23"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP22": 2, "FP29": 1, "winner": "FP22"},
                                 {"FP10": 2, "FP01": 1, "winner": "FP10"},
                                 {"FP26": 2, "FP20": 1, "winner": "FP26"},
@@ -90,26 +90,25 @@
                             ]
                         },
                         "round_4": {
-                            "male": [
+                            "male": [ 
                                 {"MP23": 3, "MP02": 0, "winner": "MP23"},
                                 {"MP13": 2, "MP14": 3, "winner": "MP14"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP22": 0, "FP07": 2, "winner": "FP07"},
                                 {"FP10": 2, "FP26": 1, "winner": "FP10"}
                             ]
                         },
                         "round_5": {
-                            "male": [
+                            "male": [ 
                                 {"MP14": 3, "MP23": 2, "winner": "MP13"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP10": 0, "FP07": 2, "winner": "FP07"}
                             ]
                         }
                     }
                 },
-
                 "TAE21": {
                     "_difficulty": 2.3,
                     "prize_money": {
@@ -124,7 +123,7 @@
                     },
                     "rounds": {
                         "round_1": {
-                            "male": [
+                            "male": [ 
                                 {"MP20": 3, "MP01": 1, "winner": "MP20"},
                                 {"MP14": 3, "MP22": 2, "winner": "MP14"},
                                 {"MP19": 1, "MP07": 3, "winner": "MP07"},
@@ -142,7 +141,7 @@
                                 {"MP15": 3, "MP24": 0, "winner": "MP15"},
                                 {"MP21": 0, "MP11": 3, "winner": "MP11"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP14": 1, "FP01": 2, "winner": "FP01"},
                                 {"FP24": 2, "FP05": 1, "winner": "FP24"},
                                 {"FP19": 0, "FP16": 2, "winner": "FP16"},
@@ -162,7 +161,7 @@
                             ]
                         },
                         "round_2": {
-                            "male": [
+                            "male": [ 
                                 {"MP30": 1, "MP11": 3, "winner": "MP11"},
                                 {"MP20": 2, "MP15": 3, "winner": "MP15"},
                                 {"MP28": 3, "MP14": 0, "winner": "MP28"},
@@ -172,7 +171,7 @@
                                 {"MP13": 3, "MP26": 2, "winner": "MP13"},
                                 {"MP29": 3, "MP06": 2, "winner": "MP29"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP01": 1, "FP24": 2, "winner": "FP24"},
                                 {"FP32": 2, "FP22": 0, "winner": "FP32"},
                                 {"FP28": 2, "FP16": 1, "winner": "FP28"},
@@ -184,13 +183,13 @@
                             ]
                         },
                         "round_3": {
-                            "male": [
+                            "male": [ 
                                 {"MP29": 3, "MP11": 0, "winner": "MP29"},
                                 {"MP07": 3, "MP28": 1, "winner": "MP07"},
                                 {"MP05": 3, "MP15": 2, "winner": "MP05"},
                                 {"MP13": 0, "MP32": 3, "winner": "MP32"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP24": 1, "FP02": 2, "winner": "FP02"},
                                 {"FP03": 2, "FP32": 0, "winner": "FP03"},
                                 {"FP28": 0, "FP31": 2, "winner": "FP31"},
@@ -198,26 +197,25 @@
                             ]
                         },
                         "round_4": {
-                            "male": [
+                            "male": [ 
                                 {"MP29": 2, "MP07": 3, "winner": "MP07"},
                                 {"MP05": 3, "MP32": 1, "winner": "MP05"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP02": 2, "FP31": 1, "winner": "FP02"},
                                 {"FP25": 0, "FP03": 2, "winner": "FP03"}
                             ]
                         },
                         "round_5": {
-                            "male": [
+                            "male": [ 
                                 {"MP07": 3, "MP05": 2, "winner": "MP07"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP03": 2, "FP02": 0, "winner": "FP03"}
                             ]
                         }
                     }
                 },
-
                 "TAW11": {
                     "_difficulty": 3.1,
                     "prize_money": {
@@ -232,7 +230,7 @@
                     },
                     "rounds": {
                         "round_1": {
-                            "male": [
+                            "male": [ 
                                 {"MP22": 3, "MP01": 1, "winner": "MP22"},
                                 {"MP14": 3, "MP20": 2, "winner": "MP14"},
                                 {"MP19": 3, "MP05": 2, "winner": "MP19"},
@@ -250,7 +248,7 @@
                                 {"MP15": 1, "MP21": 3, "winner": "MP21"},
                                 {"MP24": 2, "MP11": 3, "winner": "MP11"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP14": 1, "FP01": 2, "winner": "FP01"},
                                 {"FP24": 2, "FP05": 1, "winner": "FP24"},
                                 {"FP20": 1, "FP16": 2, "winner": "FP16"},
@@ -270,7 +268,7 @@
                             ]
                         },
                         "round_2": {
-                            "male": [
+                            "male": [ 
                                 {"MP22": 2, "MP14": 3, "winner": "MP14"},
                                 {"MP07": 3, "MP19": 1, "winner": "MP07"},
                                 {"MP23": 1, "MP03": 3, "winner": "MP03"},
@@ -280,7 +278,7 @@
                                 {"MP16": 2, "MP27": 3, "winner": "MP27"},
                                 {"MP21": 0, "MP11": 3, "winner": "MP11"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP01": 2, "FP24": 1, "winner": "FP01"},
                                 {"FP22": 1, "FP16": 2, "winner": "FP16"},
                                 {"FP32": 2, "FP15": 1, "winner": "FP32"},
@@ -292,13 +290,13 @@
                             ]
                         },
                         "round_3": {
-                            "male": [
+                            "male": [ 
                                 {"MP14": 1, "MP07": 3, "winner": "MP07"},
                                 {"MP03": 2, "MP25": 3, "winner": "MP25"},
                                 {"MP06": 2, "MP13": 3, "winner": "MP13"},
                                 {"MP11": 3, "MP27": 1, "winner": "MP11"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP01": 1, "FP16": 2, "winner": "FP16"},
                                 {"FP26": 2, "FP32": 1, "winner": "FP26"},
                                 {"FP18": 0, "FP07": 2, "winner": "FP07"},
@@ -306,26 +304,25 @@
                             ]
                         },
                         "round_4": {
-                            "male": [
-                                {"MP07": 1, "MP25": 2, "winner": "injury"},
+                            "male": [ 
+                                {"MP07": 2, "MP25": 3, "winner": "MP25"},
                                 {"MP11": 3, "MP13": 2, "winner": "MP11"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP16": 1, "FP07": 2, "winner": "FP07"},
                                 {"FP19": 2, "FP26": 0, "winner": "FP19"}
                             ]
                         },
                         "round_5": {
-                            "male": [
+                            "male": [ 
                                 {"MP25": 3, "MP11": 0, "winner": "MP25"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP19": 2, "FP07": 1, "winner": "FP19"}
                             ]
                         }
                     }
                 },
-
                 "TBS2": {
                     "_difficulty": 3.25,
                     "prize_money": {
@@ -340,7 +337,7 @@
                     },
                     "rounds": {
                         "round_1": {
-                            "male": [
+                            "male": [ 
                                 {"MP11": 2, "MP01": 3, "winner": "MP01"},
                                 {"MP14": 0, "MP20": 3, "winner": "MP20"},
                                 {"MP19": 3, "MP05": 0, "winner": "MP19"},
@@ -358,7 +355,7 @@
                                 {"MP15": 3, "MP31": 2, "winner": "MP15"},
                                 {"MP24": 2, "MP22": 3, "winner": "MP22"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP14": 2, "FP20": 0, "winner": "FP14"},
                                 {"FP24": 1, "FP05": 2, "winner": "FP05"},
                                 {"FP01": 2, "FP16": 0, "winner": "FP01"},
@@ -378,7 +375,7 @@
                             ]
                         },
                         "round_2": {
-                            "male": [
+                            "male": [ 
                                 {"MP01": 2, "MP20": 3, "winner": "MP20"},
                                 {"MP17": 3, "MP19": 1, "winner": "MP17"},
                                 {"MP23": 2, "MP18": 3, "winner": "MP18"},
@@ -388,7 +385,7 @@
                                 {"MP26": 0, "MP15": 3, "winner": "MP15"},
                                 {"MP22": 3, "MP27": 0, "winner": "MP22"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP14": 2, "FP05": 0, "winner": "FP14"},
                                 {"FP09": 0, "FP01": 2, "winner": "FP01"},
                                 {"FP32": 2, "FP28": 0, "winner": "FP32"},
@@ -400,13 +397,13 @@
                             ]
                         },
                         "round_3": {
-                            "male": [
+                            "male": [ 
                                 {"MP17": 2, "MP20": 3, "winner": "MP20"},
                                 {"MP18": 0, "MP22": 3, "winner": "MP22"},
                                 {"MP30": 3, "MP21": 1, "winner": "MP30"},
                                 {"MP12": 2, "MP15": 3, "winner": "MP15"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP14": 1, "FP01": 2, "winner": "FP01"},
                                 {"FP26": 2, "FP32": 0, "winner": "FP26"},
                                 {"FP02": 1, "FP04": 2, "winner": "FP04"},
@@ -414,20 +411,20 @@
                             ]
                         },
                         "round_4": {
-                            "male": [
+                            "male": [ 
                                 {"MP22": 3, "MP20": 0, "winner": "MP22"},
                                 {"MP30": 2, "MP15": 3, "winner": "MP15"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP01": 1, "FP26": 2, "winner": "FP26"},
                                 {"FP21": 2, "FP04": 0, "winner": "FP21"}
                             ]
                         },
                         "round_5": {
-                            "male": [
+                            "male": [ 
                                 {"MP22": 2, "MP15": 3, "winner": "MP15"}
                             ],
-                            "female": [
+                            "female": [ 
                                 {"FP21": 2, "FP26": 0, "winner": "FP21"}
                             ]
                         }

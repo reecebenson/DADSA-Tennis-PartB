@@ -9,7 +9,7 @@ from tennis.SmallJSON import SmallJSON
 class File():
     @staticmethod
     def update_season(season, new_data):
-        with open('data/game.json', 'r+') as f:
+        with open('./data/json/game.json', 'r+') as f:
             data = json.load(f)
 
             # Check our Season exists

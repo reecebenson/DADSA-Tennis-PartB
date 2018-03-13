@@ -4,7 +4,7 @@
 """
 import json
 from tennis import Tournament
-from tennis import File
+from tennis.File import File
 
 class Season():
     # Variables
@@ -69,13 +69,24 @@ class Season():
         # Grab all data
         season_data = self.json_data
 
-        c = 0
-        for m in season_data["tournaments"]["TAC1"]["rounds"]["round_3"]["male"]:
-            print(m, "---", self.get_tournament("TAC1").get_round(3).get_matches("male")[c].get_match_as_json())
-            c += 1
-        #print(season_data["tournaments"]["TAC1"]["rounds"]["round_1"]["male"][0])
+        for t in season_data["tournaments"]:
+            tournament = season_data["tournaments"][t]
+            for r in tournament:
+                if(r != "rounds"):
+                    continue
 
-        #print(json.dumps(season_data, indent=4, sort_keys=True))
+                rounds = tournament["rounds"]
+                for _r in rounds:
+                    _round = rounds[_r]
+                    _round_id = int(_r[-1:])
+                    for gender in _round:
+                        _matches = [ ]
+                        #print(t, r, _round_id, gender)
+                        _count = 0
+                        for m in _round[gender]:
+                            _matches.append(self.get_tournament(t).get_round(_round_id).get_matches(gender)[_count].get_match_as_json())
+                            _count += 1
+                        season_data["tournaments"][t]["rounds"]["round_{0}".format(_round_id)][gender] = _matches
 
         # Save
-        #return File.update(season, season_data)
+        return File().update_season(self.get_name(), season_data)
