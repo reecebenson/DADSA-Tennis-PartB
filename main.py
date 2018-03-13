@@ -2,24 +2,24 @@
 # Reece Benson
 
 import traceback
-from classes import Menu
-from classes import Handler
+from tennis import Game
+from tennis import Menu
 
 class App():
     # Define the variables we will be using
     debug = False
     menu = None
-    handler = None
+    game = None
 
     # Define all of the properties we will need to use
     def __init__(self):
-        # Load our handler
-        self.handler = Handler.Handler(self)
-        self.handler.load()
+        # Load our Game
+        self.game = Game.Game(self)
+        self.game.load()
 
-        # Show Menu
-        self.menu = Menu.Menu(self)
-        self.menu.load()
+        # Load our Menu
+        #self.menu = Menu.Menu(self)
+        #self.menu.load()
 
         # Hold the program
         self.exit()
