@@ -10,9 +10,12 @@ from tennis import Season
 # Variables
 gamePath = "./data/json/game.json"
 settingsPath = "./data/json/settings.json"
+playersPath = "./data/json/players.json"
+rankingPointsPath = "./data/json/rankingPoints.json"
 
 class Game():
-    debug = True
+    game = None
+    debug = False
     seasons = None
     settings = None
 
@@ -35,5 +38,13 @@ class Game():
             for season in seasons:
                 # Load our Season in (if it is new)
                 if(season not in self.seasons):
+                    # Get our Players
+                    season_players = None
+                    with open(playersPath) as players_file:
+                        season_players = json.load(players_file)
+
                     # Create our Season Object
-                    self.seasons.update({ season: Season.Season(self.game, season, seasons[season]) })
+                    new_season = Season.Season(self.game, season, seasons[season], season_players)
+
+                    # Update our Seasons List
+                    self.seasons.update({ season: new_season })

@@ -3,8 +3,9 @@
  # Created by Reece Benson (16021424)
 """
 import json
-from tennis import Tournament
 from tennis.File import File
+from tennis.Player import Player
+from tennis import Tournament
 
 class Season():
     # Variables
@@ -14,12 +15,15 @@ class Season():
     tournaments = None
     players = None
 
-    def __init__(self, _game, _name, _json_data):
+    def __init__(self, _game, _name, _json_data, _players):
         self.name = _name
         self.game = _game
         self.json_data = _json_data
         self.tournaments = { }
         self.players = { }
+
+        # Set our Players
+        self.set_players(_players)
 
         # Read in Tournament Data
         for tournament in _json_data["tournaments"]:
@@ -45,6 +49,24 @@ class Season():
 
     def get_tournament(self, tournament_name):
         return self.tournaments[tournament_name]
+
+    def set_players(self, player_list):
+        for gender in player_list[self.get_name()]:
+            # Add Gender to Genders List
+            if(gender not in self.players):
+                self.players.update({ gender: [ ] })
+
+            # Create Player
+            for player in player_list[self.get_name()][gender]:
+                p = Player(player, gender)
+                self.players[gender].append(p)
+
+    def get_player(self, name, gender):
+        if(gender in self.players):
+            for player in self.players[gender]:
+                if(player.get_name() == name):
+                    return player
+        return None
 
     def validate_season(self):
         # Validate Tournaments
@@ -81,7 +103,6 @@ class Season():
                     _round_id = int(_r[-1:])
                     for gender in _round:
                         _matches = [ ]
-                        #print(t, r, _round_id, gender)
                         _count = 0
                         for m in _round[gender]:
                             _matches.append(self.get_tournament(t).get_round(_round_id).get_matches(gender)[_count].get_match_as_json())

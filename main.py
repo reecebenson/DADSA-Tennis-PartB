@@ -17,8 +17,8 @@ class App():
         self.game.load()
 
         # Load our Menu
-        #self.menu = Menu.Menu(self.game)
-        #self.menu.load()
+        self.menu = Menu.Menu(self.game)
+        self.menu.load()
 
         # Hold the program
         self.exit()

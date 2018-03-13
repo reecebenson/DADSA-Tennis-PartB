@@ -13,6 +13,8 @@ class Match():
     player_two = None
     player_one_score = None
     player_two_score = None
+    player_one_object = None
+    player_two_object = None
     winner = None
 
     def __init__(self, _game, _gender, _parent, _json_data):
@@ -34,8 +36,12 @@ class Match():
             else: # Error
                 print("Something went wrong with the match data: {0}".format(_json_data))
 
+        # Apply Player Objects
+        self.player_one_object = self.parent.parent.parent.get_player(self.player_one, _gender)
+        self.player_two_object = self.parent.parent.parent.get_player(self.player_two, _gender)
+
         if(_game.debug):
-            print("[ROUND]: Match '{0}-{1}' [{2}] made!".format(self.player_one, self.player_two, self.gender))
+            print("[ROUND]: Match '{0}-{1}' [{2}] made! [{3}:{5} -- {4}:{6}]".format(self.player_one, self.player_two, self.gender, self.player_one_object, self.player_two_object, self.player_one_object.get_name(), self.player_two_object.get_name()))
 
     def get_player_one(self):
         return [ self.player_one, self.player_one_score ]
@@ -54,8 +60,9 @@ class Match():
 
     def validate_match(self, score_limit, round_id):
         # Clear Screen
-        self.game.clear_screen()
-        print(self.get_match_text(True))
+        if(self.game.debug):
+            self.game.clear_screen()
+            print("Validating Match:", self.get_match_text(True))
 
         # Check Scores are not above limit
         if((self.player_one_score > score_limit) or (self.player_two_score > score_limit)):
@@ -124,7 +131,9 @@ class Match():
         # Ensure there is a winner for this match
         if(not winner_defined):
             if(round_id is self.game.settings['round_count']):
-                print("deh fuq is going on here, {0}.".format(self.get_match_text()))
+                self.game.clear_screen()
+                print("Unable to set a winner for the following match as it is on the last round: {0}".format(self.get_match_text()))
+                exit()
             else:
                 print("The scores for this match seem to be incomplete, finding the winner through Round {0}...".format(round_id + 1))
                 this_round_winners = self.parent.get_winners(self.gender)
@@ -149,7 +158,7 @@ class Match():
                         self.player_one_score = score_limit - 1
                         self.player_two_score = score_limit
                     else:
-                        print("Modifying this player will corrupt the data.")
+                        print("Modifying this player will corrupt the data, skipping...")
                     input(">>> Press <Return> to continue...")
 
         return True

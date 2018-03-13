@@ -18,9 +18,29 @@ class Menu():
         # Create our Menu
         Builder().init(self._game, False, reloading)
 
+        ## MAIN ------------------------------------------------------------------------------------------------------------------------------
         Builder().add_menu("main", "Load Game", "load_game")
         Builder().add_menu("main", "Developer Information", "info")
+        Builder().add_func("main", "info", partial(print, "Created by Reece Benson, 16021424."))
 
+        ## SEASONS ---------------------------------------------------------------------------------------------------------------------------
+        for season in self._game.seasons:
+            season_id = season[-1:]
+            Builder().add_menu("load_game", "Season {}".format(season_id), "view_{}".format(season))
+
+            ## TOURNAMENTS -------------------------------------------------------------------------------------------------------------------
+            for tournament in self._game.seasons[season].get_tournaments():
+                Builder().add_menu("view_{}".format(season), tournament.get_name(), "t{}".format(tournament.get_name()))
+
+                ## ROUNDS --------------------------------------------------------------------------------------------------------------------
+                for t_round in tournament.get_rounds():
+                    Builder().add_menu("t{}".format(tournament.get_name()), "Round {}".format(t_round.get_id()), "t{}_r{}".format(tournament.get_name(), t_round.get_id()))
+
+                    ## GENDERS ---------------------------------------------------------------------------------------------------------------
+                    for gdr in t_round.get_genders():
+                        Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), gdr.title(), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr))
+
+        # Show Menu
         Builder().show_current_menu()
 
 
