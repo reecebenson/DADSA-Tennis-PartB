@@ -1,0 +1,38 @@
+Menu
+1. Init
+2. Load Prev
+
+Init
+1. Input reuslts
+2. Statistical Analysis
+3. New Season
+
+Input Results
+1-4 - Tournaments
+
+Tournaments
+1-2 - Genders
+
+Picking a Gender, shows the rounds
+Picking a round will give you the option - Input from file, - input manually
+
+1 - Input from file :: Show first match, ask if the match is valid - then ask for the winner's name, etc
+
+2 - Input manually  :: playerA,playerAscore,playerB,playerBscore
+
+
+Statistical Analysis
+- Ranking by points per tournament
+- Ranking by prizes per tournament
+- Ranking by points overall
+- Ranking by prizes overall
+- Personal Statistics (per player)
+
+Personal Statistics
+A - Number of wins for a player with a particular score
+B - The percentage wins of a player
+C - Show the player with most wins in the season
+D - Show the player with most loses in the season
+
+A --- Please give name of player, score and tournament name (MP14,3:2,TAC1)
+

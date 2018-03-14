@@ -4,12 +4,13 @@
 """
 # Imports
 import json
+import pickle
 from tennis.SmallJSON import SmallJSON
 
 class File():
     @staticmethod
     def update_season(season, new_data):
-        with open('./data/json/game.json', 'r+') as f:
+        with open('./data/pickle/game.json', 'r+') as f:
             data = json.load(f)
 
             # Check our Season exists
@@ -26,3 +27,7 @@ class File():
                 return False
         return True
 
+    @staticmethod
+    def save_session(session_data):
+        with open('./data/pickle/session.pickle', 'wb') as f:
+            pickle.dump(session_data, f, protocol=pickle.HIGHEST_PROTOCOL)

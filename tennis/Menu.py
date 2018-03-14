@@ -23,7 +23,9 @@ class Menu():
 
         ## MAIN ------------------------------------------------------------------------------------------------------------------------------
         Builder().add_menu("main", "Load Game", "loadgame")
+        Builder().add_info("loadgame", "List the seasons within this Tennis game.")
         Builder().add_menu("main", "Developer Information", "info")
+        Builder().add_info("info", "Show information about the developer.")
         if(menu_debug): Builder().add_menu("main", "Debugging", "debug")
         Builder().add_func("main", "info", partial(print, "Created by Reece Benson, 16021424."))
 
@@ -300,6 +302,8 @@ class Builder():
                     current_menu = Builder.get_item(Builder._current)
                     if(req == (len(current_menu) + 1) and Builder._current is not "main"):
                         return Builder.go_back()
+                    elif(req == (len(current_menu) + 1) and Builder._current is "main"):
+                        return self.game.exit()
                     else:
                         return Builder.show_current_menu(True, True, "You have entered an invalid option")
             # Exceptions (handled from outer-scope try/except)
@@ -360,6 +364,8 @@ class Builder():
             # Print our back button
             if(Builder.current_menu() is not "main"):
                 print("b. Back")
+            else:
+                print("x. Exit and Save")
 
             # Get input from user
             Builder.monitor_input()
