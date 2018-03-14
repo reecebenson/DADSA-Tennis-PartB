@@ -9,27 +9,37 @@ from collections import OrderedDict
 
 class Menu():
     # Define our Game
-    _game = None
+    game = None
 
-    def __init__(self, game):
-        self._game = game
+    def __init__(self, _game):
+        self.game = _game
 
     def load(self, reloading = False):
+        # Temporary Menu Debug
+        menu_debug = True
+
         # Create our Menu
-        Builder().init(self._game, False, reloading)
+        Builder().init(self.game, False, reloading)
 
         ## MAIN ------------------------------------------------------------------------------------------------------------------------------
-        Builder().add_menu("main", "Load Game", "load_game")
+        Builder().add_menu("main", "Load Game", "loadgame")
         Builder().add_menu("main", "Developer Information", "info")
+        if(menu_debug): Builder().add_menu("main", "Debugging", "debug")
         Builder().add_func("main", "info", partial(print, "Created by Reece Benson, 16021424."))
 
         ## SEASONS ---------------------------------------------------------------------------------------------------------------------------
-        for season in self._game.seasons:
+        for season in self.game.seasons:
+            season_obj = self.game.seasons[season]
             season_id = season[-1:]
-            Builder().add_menu("load_game", "Season {}".format(season_id), "view_{}".format(season))
+            Builder().add_menu("loadgame", "Season {}".format(season_id), "view_{}".format(season))
+
+            ## DEBUG -------------------------------------------------------------------------------------------------------------------------
+            if(menu_debug):
+                Builder().add_menu("debug", "List Season {} Players".format(season_id), "debug_list_players_s{}".format(season_id))
+                Builder().add_func("debug", "debug_list_players_s{}".format(season_id), partial(season_obj.list_players))
 
             ## TOURNAMENTS -------------------------------------------------------------------------------------------------------------------
-            for tournament in self._game.seasons[season].get_tournaments():
+            for tournament in self.game.seasons[season].get_tournaments():
                 Builder().add_menu("view_{}".format(season), tournament.get_name(), "t{}".format(tournament.get_name()))
 
                 ## ROUNDS --------------------------------------------------------------------------------------------------------------------
@@ -46,7 +56,7 @@ class Menu():
 
 """Start of Menu Builder Class"""        
 class Builder():
-    _game = None
+    game = None
     _menu = None
     _tree = None
     _current = None
@@ -57,7 +67,7 @@ class Builder():
     @staticmethod
     def init(game, title = False, reloading = False):
         # Set our variables
-        Builder._game = game
+        Builder.game = game
         Builder._menu = { }
 
         # Flags will be reset when the menu is closed and reinitialised, or when the menu is closed and then reloaded (init called again)
@@ -257,7 +267,7 @@ class Builder():
                             call("cls")
 
                             # Print Function Header
-                            if(Builder._game.debug):
+                            if(Builder.game.debug):
                                 print(" _______ ______ _   _ _   _ _____  _____ ")
                                 print("|__   __|  ____| \\ | | \\ | |_   _|/ ____|")
                                 print("   | |  | |__  |  \\| |  \\| | | | | (___  ")
@@ -276,8 +286,8 @@ class Builder():
                             if(not Builder._force_reload):
                                 return Builder.show_current_menu()
                             else:
-                                Builder._game.menu = Menu(Builder._game)
-                                return Builder._game.menu.load(True)
+                                Builder.game.menu = Menu(Builder.game)
+                                return Builder.game.menu.load(True)
                         else:
                             if(not Builder.item_exists(req_menu['ref'])):
                                 return Builder.show_current_menu(True, True, "That option is unavailable")
@@ -300,13 +310,13 @@ class Builder():
         # Exceptions
         except KeyboardInterrupt:
             # User has terminated the program (Ctrl+C)
-            return Builder._game.exit()
+            return Builder.game.exit()
         except ValueError:
             # User has entered an invalid value
             return Builder.show_current_menu(True, True, "You have entered an invalid option")
         except Exception:
             # Handle other exceptions, and if debugging - show the error and halt the application
-            if(Builder._game.debug):
+            if(Builder.game.debug):
                 print("\nERROR:\nError Handled:\n{0}\n".format(traceback.print_exc()))
                 input("...continue")
             # Application has handled error for User

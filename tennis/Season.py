@@ -10,6 +10,7 @@ from tennis import Tournament
 class Season():
     # Variables
     name = None
+    id = None
     game = None
     json_data = None
     tournaments = None
@@ -17,6 +18,7 @@ class Season():
 
     def __init__(self, _game, _name, _json_data, _players):
         self.name = _name
+        self.id = _name[-1:]
         self.game = _game
         self.json_data = _json_data
         self.tournaments = { }
@@ -33,8 +35,6 @@ class Season():
             if(tournament not in self.tournaments):
                 # Create our Tournament Object
                 self.tournaments.update({ tournament: Tournament.Tournament(self.game, tournament, self, tournament_data) })
-            else:
-                print("Something is fucked!")
 
         if(_game.debug):
             print("[SEASON]: Season '{}' made!".format(_name))
@@ -43,6 +43,9 @@ class Season():
 
     def get_name(self):
         return self.name
+
+    def get_id(self):
+        return self.id
 
     def get_tournaments(self):
         return [ self.tournaments[t] for t in self.tournaments ]
@@ -58,15 +61,21 @@ class Season():
 
             # Create Player
             for player in player_list[self.get_name()][gender]:
-                p = Player(player, gender)
+                p = Player(player, gender, self)
                 self.players[gender].append(p)
-
+    
     def get_player(self, name, gender):
         if(gender in self.players):
             for player in self.players[gender]:
                 if(player.get_name() == name):
                     return player
         return None
+
+    def list_players(self):
+        print("Season: {}\n".format(self.get_name()))
+        for gender in self.players:
+            print("Gender: {}, count: {}".format(gender, len(self.players[gender])))
+            print("{0}\n".format(", ".join([ player.get_name() for player in self.players[gender] ])))
 
     def validate_season(self):
         # Validate Tournaments

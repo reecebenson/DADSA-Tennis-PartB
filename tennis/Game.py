@@ -16,7 +16,7 @@ rankingPointsPath = "./data/json/rankingPoints.json"
 class Game():
     game = None
     parent = None
-    debug = False
+    debug = True
     seasons = None
     settings = None
 

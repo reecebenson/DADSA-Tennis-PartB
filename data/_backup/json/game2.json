@@ -85,7 +85,7 @@
                             "female": [ 
                                 {"FP22": 2, "FP29": 1, "winner": "FP22"},
                                 {"FP10": 2, "FP01": 1, "winner": "FP10"},
-                                {"FP26": 1, "FP20": 2, "winner": "FP20"},
+                                {"FP26": 2, "FP20": 1, "winner": "FP26"},
                                 {"FP13": 0, "FP07": 2, "winner": "FP07"}
                             ]
                         },
