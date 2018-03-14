@@ -15,17 +15,16 @@ rankingPointsPath = "./data/json/rankingPoints.json"
 
 class Game():
     game = None
+    parent = None
     debug = False
     seasons = None
     settings = None
 
-    def __init__(self):
+    def __init__(self, _parent):
         self.game = self
+        self.parent = _parent
         self.seasons = { }
         self.settings = { }
-
-    def clear_screen(self):
-        call("cls")
 
     def load(self):
         with open(settingsPath) as settings_file:
@@ -48,3 +47,9 @@ class Game():
 
                     # Update our Seasons List
                     self.seasons.update({ season: new_season })
+
+    def exit(self):
+        self.parent.exit()
+
+    def clear_screen(self):
+        call("cls")

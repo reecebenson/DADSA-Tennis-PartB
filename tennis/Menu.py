@@ -46,7 +46,7 @@ class Menu():
 
 """Start of Menu Builder Class"""        
 class Builder():
-    _app = None
+    _game = None
     _menu = None
     _tree = None
     _current = None
@@ -55,9 +55,9 @@ class Builder():
     _force_reload = None
 
     @staticmethod
-    def init(app, title = False, reloading = False):
+    def init(game, title = False, reloading = False):
         # Set our variables
-        Builder._app = app
+        Builder._game = game
         Builder._menu = { }
 
         # Flags will be reset when the menu is closed and reinitialised, or when the menu is closed and then reloaded (init called again)
@@ -257,7 +257,7 @@ class Builder():
                             call("cls")
 
                             # Print Function Header
-                            if(Builder._app.debug):
+                            if(Builder._game.debug):
                                 print(" _______ ______ _   _ _   _ _____  _____ ")
                                 print("|__   __|  ____| \\ | | \\ | |_   _|/ ____|")
                                 print("   | |  | |__  |  \\| |  \\| | | | | (___  ")
@@ -276,8 +276,8 @@ class Builder():
                             if(not Builder._force_reload):
                                 return Builder.show_current_menu()
                             else:
-                                Builder._app.menu = Menu(Builder._app)
-                                return Builder._app.menu.load(True)
+                                Builder._game.menu = Menu(Builder._game)
+                                return Builder._game.menu.load(True)
                         else:
                             if(not Builder.item_exists(req_menu['ref'])):
                                 return Builder.show_current_menu(True, True, "That option is unavailable")
@@ -300,13 +300,13 @@ class Builder():
         # Exceptions
         except KeyboardInterrupt:
             # User has terminated the program (Ctrl+C)
-            return Builder._app.exit()
+            return Builder._game.exit()
         except ValueError:
             # User has entered an invalid value
             return Builder.show_current_menu(True, True, "You have entered an invalid option")
         except Exception:
             # Handle other exceptions, and if debugging - show the error and halt the application
-            if(Builder._app.debug):
+            if(Builder._game.debug):
                 print("\nERROR:\nError Handled:\n{0}\n".format(traceback.print_exc()))
                 input("...continue")
             # Application has handled error for User

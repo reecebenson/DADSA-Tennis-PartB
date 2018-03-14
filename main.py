@@ -2,6 +2,7 @@
 # Reece Benson
 
 import traceback
+import sys
 from tennis import Game
 from tennis import Menu
 
@@ -13,7 +14,7 @@ class App():
     # Define all of the properties we will need to use
     def __init__(self):
         # Load our Game
-        self.game = Game.Game()
+        self.game = Game.Game(self)
         self.game.load()
 
         # Load our Menu
@@ -26,6 +27,6 @@ class App():
     # A method which exits the program after the user has pressed the Return key
     def exit(self):
         input("\n\n>>> Press <Return> to terminate the program")
-        exit()
+        sys.exit()
 
 App()
