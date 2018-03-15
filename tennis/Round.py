@@ -121,14 +121,12 @@ class Round():
         for match in self.get_matches(gender):
             match.validate_match(self.game.settings["score_limit"][gender], self.get_id(), True)
 
+        # Clear Screen
+        self.game.clear_screen()
+
         # Print Matches
         for match in self.get_matches(gender):
             print(match.get_match_text())
-
-            # Check for errors
-            #if(match.validity()[0]):
-            #    print("Error in this match: [{}] {}".format(match.get_match_text(), match.validity()[1]))
-            #    match.validate_match(self.game.settings["score_limit"][gender], self.get_id(), True)
 
         # Mark next round as available
         next_round_id = self.get_id() + 1
@@ -136,7 +134,7 @@ class Round():
             self.parent.get_round(next_round_id).set_available(gender)
 
             if(self.game.debug):
-                print("Set Season {}, Tour {}, Round {} for {} as available.".format(self.parent.parent.get_name(), self.parent.get_name(), next_round_id, gender))
+                print("\nSet Season {}, Tour {}, Round {} for {} as available.".format(self.parent.parent.get_name(), self.parent.get_name(), next_round_id, gender))
         
         # Go back on the Main Menu
         Builder().go_back(True)

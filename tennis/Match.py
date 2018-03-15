@@ -97,6 +97,7 @@ class Match():
 
     def validate_match(self, score_limit, round_id, user_validate=False):
         # Reset Invalidity
+        error = False
         self.invalid = False
         self.invalid_reason = None
 
@@ -113,6 +114,7 @@ class Match():
             self.invalid_reason = "above_score_limit"
             
             if(user_validate):
+                error = True
                 self.game.clear_screen()
                 if(self.player_one_score > score_limit):
                     print("Player One [{0}] has a score of {1} whereas the limit is {2}, please enter a new score.".format(self.player_one, self.player_one_score, score_limit))
@@ -136,28 +138,14 @@ class Match():
             self.invalid_reason = "same_scores"
             
             if(user_validate):
+                error = True
                 self.game.clear_screen()
                 print(self.get_text())
 
                 # Check if we're on the last round
                 if(round_id is self.game.settings['round_count']):
                     print("Player One [{0}] and Player Two [{1}] have the same score of {2}, please enter their new scores.".format(self.player_one, self.player_two, self.player_one_score))
-                    player_one_new_score = input("{0}: >>> ".format(self.player_one))
-                    player_two_new_score = input("{0}: >>> ".format(self.player_two))
-                    if(player_one_new_score.isdigit() and player_two_new_score.isdigit()):
-                        # Set Scores
-                        self.player_one_score = int(player_one_new_score)
-                        self.player_two_score = int(player_two_new_score)
-
-                        # Set Winner
-                        if(self.player_one_score > self.player_two_score):
-                            self.winner = self.player_one
-                        elif(self.player_two_score > self.player_one_score):
-                            self.winner = self.player_two
-                        else:
-                            return self.validate_match(score_limit, round_id)
-                    else:
-                        return self.validate_match(score_limit, round_id)
+                    self.player_scores_manual_input()
 
                 # Check in the next round for the winner
                 else:
@@ -174,51 +162,7 @@ class Match():
                                 break
 
                     print("Player One [{0}] and Player Two [{1}] have the same score of {2}.\nWould you like to manually input their scores or find the winner from the next round? [manual/FIND]".format(self.player_one, self.player_two, self.player_one_score))
-                    resp = input(">>> ")
-                    if(resp.lower() == "manual" or resp.lower() == "m"):
-                        print("\nThis is the least preferred option as it may corrupt more data if the winner does not exist within the next round.")
-                        print("The next round ({1}) has a player named {0} who has not been classed as a winner within this round ({2}).".format(available_player, round_id+1, round_id))
-                        print("Please enter the players new scores:")
-                        player_one_new_score = input("{0}: >>> ".format(self.player_one))
-                        player_two_new_score = input("{0}: >>> ".format(self.player_two))
-                        if(player_one_new_score.isdigit() and player_two_new_score.isdigit()):
-                            # Set Scores
-                            self.player_one_score = int(player_one_new_score)
-                            self.player_two_score = int(player_two_new_score)
-
-                            # Set Winner
-                            if(self.player_one_score > self.player_two_score):
-                                self.winner = self.player_one
-                            elif(self.player_two_score > self.player_one_score):
-                                self.winner = self.player_two
-                            else:
-                                return self.validate_match(score_limit, round_id)
-                        else:
-                            return self.validate_match(score_limit, round_id)
-                    elif(resp.lower() == "find" or resp.lower() == "f"):
-                        print("\nFinding the winner through Round {0}...".format(round_id + 1))
-
-                        if(this_round_winners and next_round_players):
-                            # Available Players
-                            available_player = None
-                            for p in next_round_players:
-                                if(p not in this_round_winners):
-                                    available_player = p
-                                    break
-
-                            print("Available Player: {0}\n\nThe winner of this match will be set to {0}.".format(available_player))
-
-                            if(available_player is self.player_one):
-                                self.winner = self.player_one
-                                self.player_one_score = score_limit
-                                self.player_two_score = score_limit - 1
-                            elif(available_player is self.player_two):
-                                self.winner = self.player_two
-                                self.player_one_score = score_limit - 1
-                                self.player_two_score = score_limit
-                            else:
-                                print("Modifying this player will corrupt the data.")
-                            input(">>> Press <Return> to continue...")
+                    self.find_available_player(score_limit, round_id)
 
         # Check there is atleast one winner
         winner_defined = True
@@ -229,6 +173,7 @@ class Match():
 
         # Ensure there is a winner for this match
         if(not winner_defined and user_validate):
+            error = True
             self.game.clear_screen()
             if(round_id is self.game.settings['round_count']):
                 print(self.get_text())
@@ -237,32 +182,79 @@ class Match():
             else:
                 print(self.get_text())
                 print("The scores for this match seem to be incomplete, finding the winner through Round {0} (score lmiit: {1})...".format(round_id + 1, score_limit))
+                self.find_available_player(score_limit, round_id)
 
-                # Get next rounds winner
-                this_round_winners = self.parent.get_winners(self.gender)
-                next_round_players = self.parent.parent.get_round(round_id + 1).get_players(self.gender)
-                available_player = None
+        # Intensive Recursion
+        if(error):
+            return self.validate_match(score_limit, round_id, user_validate)
+        else:
+            return True
 
-                if(this_round_winners and next_round_players):
-                    # Available Players
-                    for p in next_round_players:
-                        if(p not in this_round_winners):
-                            available_player = p
-                            print(available_player)
-                            break
+    def find_available_player(self, score_limit, round_id):
+        # Get next rounds winner
+        this_round_winners = self.parent.get_winners(self.gender)
+        next_round_players = self.parent.parent.get_round(round_id + 1).get_players(self.gender)
+        available_player = None
 
-                    print("Available Player: {0}\n\nThe winner of this match will be set to {0}.".format(available_player))
+        if(this_round_winners and next_round_players):
+            # Available Players
+            for p in next_round_players:
+                if(p not in this_round_winners):
+                    available_player = p
+                    break
 
-                    if(available_player is self.player_one):
-                        self.winner = self.player_one
-                        self.player_one_score = score_limit
-                        self.player_two_score = score_limit - 1
-                    elif(available_player is self.player_two):
-                        self.winner = self.player_two
-                        self.player_one_score = score_limit - 1
-                        self.player_two_score = score_limit
-                    else:
-                        print("Modifying this player will corrupt the data, skipping...")
-                    input(">>> Press <Return> to continue...")
+            if(available_player is not None):
+                print("Available Player: {0}\n\nThe winner of this match will be set to {0}, confirm? [Y/n]".format(available_player))
+                resp = input(">>> ")
+                if(resp == "y" or resp == ""):
+                    self.player_scores_find(available_player, score_limit, round_id)
+                else:
+                    self.player_scores_manual_input(score_limit, round_id)
 
-        return True
+    def player_scores_find(self, available_player, score_limit, round_id):
+        if(available_player is self.player_one):
+            self.winner = self.player_one
+            self.player_one_score = score_limit
+            self.player_two_score = score_limit - 1
+            return True
+        elif(available_player is self.player_two):
+            self.winner = self.player_two
+            self.player_one_score = score_limit - 1
+            self.player_two_score = score_limit
+            return True
+        else:
+            print("Modifying this player will corrupt the data, skipping...")
+        return False
+
+    def player_scores_manual_input(self, score_limit, round_id):
+        print("Please enter the players new scores:")
+        player_one_new_score = input("{0}: >>> ".format(self.player_one))
+        player_two_new_score = input("{0}: >>> ".format(self.player_two))
+        if(player_one_new_score.isdigit() and player_two_new_score.isdigit()):
+            # Set Scores
+            self.player_one_score = int(player_one_new_score)
+            self.player_two_score = int(player_two_new_score)
+
+            # Set Winner
+            if(self.player_one_score > self.player_two_score):
+                self.winner = self.player_one
+            elif(self.player_two_score > self.player_one_score):
+                self.winner = self.player_two
+            else:
+                return self.validate_match(score_limit, round_id)
+
+            # Validate Next Rounds
+            next_round_id = round_id + 1
+            if(next_round_id <= self.game.settings['round_count']):
+                next_round_players = self.parent.parent.get_round(next_round_id).get_players(self.gender)
+
+                # Check that the winner is within the next round
+                if(self.winner not in next_round_players):
+                    print("\nYou have selected {0}, who is not a valid participant within the next round.\nDue to this, all future rounds within this tournament will require manual input.".format(self.winner))
+                else:
+                    print("That winner is perfect, thanks.")
+                input(">>> Press <Return> to continue...")
+            else:
+                print("too high of a round", self.parent.get_id(), next_round_id)
+        else:
+            return self.validate_match(score_limit, round_id)
