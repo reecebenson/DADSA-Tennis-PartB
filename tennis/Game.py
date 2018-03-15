@@ -20,6 +20,7 @@ rankingPointsPath = "./data/json/rankingPoints.json"
 
 class Game():
     game = None
+    menu = None
     parent = None
     debug = True
     seasons = None
@@ -28,6 +29,7 @@ class Game():
     def __init__(self, _parent):
         # Initial Variables
         self.game = self
+        self.menu = None
         self.parent = _parent
         self.seasons = { }
         self.settings = { }
@@ -70,14 +72,29 @@ class Game():
     def get_season(self, season_name):
         return self.seasons[season_name] if season_name in self.seasons else None
 
+    def get_seasons(self):
+        return self.seasons
+
+    def list_available_rounds(self):
+        for season in self.get_seasons().values():
+            for tournament in season.get_tournaments():
+                for rounds in tournament.get_rounds():
+                    for gender in rounds.get_genders():
+                        for matches in rounds.get_matches(gender):
+                            print(season.get_name(), tournament.get_name(), rounds.get_name(), gender, matches.get_match_text(), rounds.is_available(gender)) 
+
     def clear_screen(self):
         call("cls")
 
-    def exit(self):
+    def save(self):
         # Save current session
         print("Saving session...")
         File().save_session(self.seasons)
         print("done.")
+
+    def exit(self):
+        # Save
+        self.save()
 
         # Exit
         self.parent.exit()

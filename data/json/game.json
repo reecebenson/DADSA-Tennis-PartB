@@ -17,7 +17,7 @@
                     "rounds": {
                         "round_1": {
                             "male": [
-                                {"MP11": 2, "MP01": 3, "winner": "MP01"},
+                                {"MP11": 2, "MP01": 2, "winner": "MP01"},
                                 {"MP14": 3, "MP05": 1, "winner": "MP14"},
                                 {"MP19": 0, "MP07": 3, "winner": "MP07"},
                                 {"MP22": 3, "MP10": 2, "winner": "MP22"},

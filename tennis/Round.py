@@ -3,6 +3,7 @@
  # Created by Reece Benson (16021424)
 """
 from tennis import Match
+from tennis.Menu import Menu
 from tennis.Menu import Builder
 from functools import partial
 
@@ -83,12 +84,62 @@ class Round():
             self.genders_available[gender] = False
         return None
 
-    def run(self, gender):
+    def run(self, gender, error=False):
         if(self.game.debug):
             print("Emulating {}, {}, Round {}, {}.\n".format(self.parent.parent.get_name(), self.parent.get_name(), self.get_id(), gender))
 
-        # Small Menu
-        builder = Builder().init(self.game, False, False, True)
-        builder.add_menu("main", "Input by File", "input_file")
-        builder.add_menu("main", "Input manually", "input_manual")
-        builder.show_current_menu()
+        # Clear Screen
+        self.game.clear_screen()
+
+        # Show Error
+        if(error):
+            print("You have entered an invalid option.\n\n")
+
+        # Menu Options
+        print("Please select an option:")
+        print("1. Input using file data")
+        print("2. Input data manually")
+        print("x. Save and Return")
+
+        # Menu Response
+        resp = input(">>> ")
+        if(resp.isdigit()):
+            if(resp == "1"):
+                self.input_file(gender)
+            elif(resp == "2"):
+                self.input_manual(gender)
+            else:
+                return self.run(gender)
+        elif(resp == "x"):
+            self.game.save()
+        else:
+            return self.run(gender)
+        Builder().reload_menu()
+
+    def input_file(self, gender):
+        # Validate Matches
+        for match in self.get_matches(gender):
+            match.validate_match(self.game.settings["score_limit"][gender], self.get_id(), True)
+
+        # Print Matches
+        for match in self.get_matches(gender):
+            print(match.get_match_text())
+
+            # Check for errors
+            #if(match.validity()[0]):
+            #    print("Error in this match: [{}] {}".format(match.get_match_text(), match.validity()[1]))
+            #    match.validate_match(self.game.settings["score_limit"][gender], self.get_id(), True)
+
+        # Mark next round as available
+        next_round_id = self.get_id() + 1
+        if(next_round_id <= self.game.settings['round_count']):
+            self.parent.get_round(next_round_id).set_available(gender)
+
+            if(self.game.debug):
+                print("Set Season {}, Tour {}, Round {} for {} as available.".format(self.parent.parent.get_name(), self.parent.get_name(), next_round_id, gender))
+        
+        # Go back on the Main Menu
+        Builder().go_back(True)
+
+    def input_manual(self, gender):
+        print("something else")

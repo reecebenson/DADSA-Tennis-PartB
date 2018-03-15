@@ -19,59 +19,48 @@ class Menu():
         menu_debug = True
 
         # Create our Menu
-        builder = Builder().init(self.game, False, reloading)
+        Builder().init(self.game, False, reloading)
 
         ## MAIN ------------------------------------------------------------------------------------------------------------------------------
-        builder.add_menu("main", "Load Game", "loadgame")
-        builder.add_info("loadgame", "List the seasons within this Tennis game.")
-        builder.add_menu("main", "Developer Information", "info")
-        builder.add_info("info", "Show information about the developer.")
-        if(menu_debug): builder.add_menu("main", "Debugging", "debug")
-        builder.add_func("main", "info", partial(print, "Created by Reece Benson, 16021424."))
+        Builder().add_menu("main", "Load Game", "loadgame")
+        Builder().add_info("loadgame", "List the seasons within this Tennis game.")
+        Builder().add_menu("main", "Developer Information", "info")
+        Builder().add_info("info", "Show information about the developer.")
+        if(menu_debug): Builder().add_menu("main", "Debugging", "debug")
+        Builder().add_func("main", "info", partial(print, "Created by Reece Benson, 16021424."))
 
         ## SEASONS ---------------------------------------------------------------------------------------------------------------------------
         for season in self.game.seasons:
             season_obj = self.game.seasons[season]
             season_id = season[-1:]
-            builder.add_menu("loadgame", "Season {}".format(season_id), "view_{}".format(season))
+            Builder().add_menu("loadgame", "Season {}".format(season_id), "view_{}".format(season))
 
             ## DEBUG -------------------------------------------------------------------------------------------------------------------------
             if(menu_debug):
-                builder.add_menu("debug", "List Season {} Players".format(season_id), "debug_list_players_s{}".format(season_id))
-                builder.add_func("debug", "debug_list_players_s{}".format(season_id), partial(season_obj.list_players))
+                Builder().add_menu("debug", "List Season {} Players".format(season_id), "debug_list_players_s{}".format(season_id))
+                Builder().add_func("debug", "debug_list_players_s{}".format(season_id), partial(season_obj.list_players))
 
             ## TOURNAMENTS -------------------------------------------------------------------------------------------------------------------
             for tournament in self.game.seasons[season].get_tournaments():
-                builder.add_menu("view_{}".format(season), tournament.get_name(), "t{}".format(tournament.get_name()))
+                Builder().add_menu("view_{}".format(season), tournament.get_name(), "t{}".format(tournament.get_name()))
 
                 ## ROUNDS --------------------------------------------------------------------------------------------------------------------
                 for t_round in tournament.get_rounds():
-                    builder.add_menu("t{}".format(tournament.get_name()), "Round {}".format(t_round.get_id()), "t{}_r{}".format(tournament.get_name(), t_round.get_id()))
+                    Builder().add_menu("t{}".format(tournament.get_name()), "Round {}".format(t_round.get_id()), "t{}_r{}".format(tournament.get_name(), t_round.get_id()))
 
                     ## GENDERS ---------------------------------------------------------------------------------------------------------------
                     for gdr in t_round.get_genders():
-                        builder.add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), gdr.title(), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr))
+                        Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), gdr.title(), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr))
 
                         ## CHECK GENDER IS AVAILABLE
                         if(t_round.is_available(gdr)):
-                            builder.add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr), partial(t_round.run, gdr))
-                            #builder.add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr), partial(self.mark_as_available, season, tournament.get_name(), t_round.get_name(), gdr))
+                            Builder().add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr), partial(t_round.run, gdr))
 
         # Show Menu
-        builder.show_current_menu()
-
-    """def mark_as_available(self, season_name, tournament_name, round_name, gender):
-        round_id = int(round_name[-1:])
-
-        season = self.game.get_season(season_name)
-        tournament = season.get_tournament(tournament_name)
-        t_round = tournament.get_round(round_id + 1)
-        t_round.set_available(gender)
-        print("Set Season {}, Tour {}, Round {} for {} as available.".format(season_name, tournament_name, round_id, gender))
-        self().reload_menu()"""
+        Builder().show_current_menu()
 
 
-"""Start of Menu self Class"""        
+"""Start of Menu Builder Class"""        
 class Builder():
     game = None
     _menu = None
@@ -80,110 +69,118 @@ class Builder():
     _title = None
     _force_close = None
     _force_reload = None
-    _submenu = None
 
-    def init(self, game, title = False, reloading = False, submenu = False):
+    @staticmethod
+    def init(game, title = False, reloading = False):
         # Set our variables
-        self.game = game
-        self._menu = { }
-        self._submenu = submenu
+        Builder.game = game
+        Builder._menu = { }
 
         # Flags will be reset when the menu is closed and reinitialised, or when the menu is closed and then reloaded (init called again)
-        self._force_close = False
-        self._force_reload = False
+        Builder._force_close = False
+        Builder._force_reload = False
 
         # If we're reloading, don't reset our current pos or data related to current open menu
         if(not reloading):
             # Set our other variables
-            self._tree = [ "main" ]
-            self._current = "main"
-            self._title = "Please select an option:" if not title else title
+            Builder._tree = [ "main" ]
+            Builder._current = "main"
+            Builder._title = "Please select an option:" if not title else title
 
-        # Return Object
-        return self
-
-    def close_menu(self):
+    @staticmethod
+    def close_menu():
         # Set our flag
-        self._force_close = True
+        Builder._force_close = True
 
-    def reload_menu(self):
+    @staticmethod
+    def reload_menu():
         # We will pop() [go back] to avoid hitting any errors (maybe menu is replaced with a function, etc)
-        #self.go_back(True)
+        #Builder.go_back(True)
 
         # Set our flag
-        self._force_reload = True
+        Builder._force_reload = True
 
-    def add_menu(self, menu, name, ref):
+    @staticmethod
+    def add_menu(menu, name, ref):
         # Check if this submenu exists
-        if(not menu in self._menu):
-            self._menu[menu] = { }
+        if(not menu in Builder._menu):
+            Builder._menu[menu] = { }
 
         # Update our Menu
-        self._menu[menu].update({ ref: name })
+        Builder._menu[menu].update({ ref: name })
 
-    def add_info(self, ref, info):
+    @staticmethod
+    def add_info(ref, info):
         # Add additional information to a menu item
-        self._menu[ref+"_info"] = info
+        Builder._menu[ref+"_info"] = info
 
-    def add_func(self, name, ref, func):
+    @staticmethod
+    def add_func(name, ref, func):
         # Add a selectable function to the referred menu item
-        self._menu[ref] = func
+        Builder._menu[ref] = func
 
-    def get_item(self, ref):
+    @staticmethod
+    def get_item(ref):
         # Get an existing item, otherwise return None
-        if(not ref in self._menu):
+        if(not ref in Builder._menu):
             return None
         else:
-            return self._menu[ref]
+            return Builder._menu[ref]
         return None
 
-    def call_func(self, ref):
+    @staticmethod
+    def call_func(ref):
         # Call the function reference of a menu item
-        if(self.is_func(ref)):
-            return self.get_item(ref)()
+        if(Builder.is_func(ref)):
+            return Builder.get_item(ref)()
         else:
             return None
 
-    def is_func(self, ref):
+    @staticmethod
+    def is_func(ref):
         # Check if the function reference is callable / is a function
-        return callable(self.get_item(ref))
+        return callable(Builder.get_item(ref))
 
-    def item_exists(self, ref):
+    @staticmethod
+    def item_exists(ref):
         # Check if a menu item or reference exists
-        return (ref in self._menu)
+        return (ref in Builder._menu)
 
-    def is_menu(self, ref):
+    @staticmethod
+    def is_menu(ref):
         # Set flag
         is_a_menu = True
         
         # Check if the "menu" exists
-        if(not ref in self._menu):
+        if(not ref in Builder._menu):
             is_a_menu = False
 
         # Check if the menu is a dictionary
-        if(type(self.get_item(ref)) != dict):
+        if(type(Builder.get_item(ref)) != dict):
             is_a_menu = False
 
         return is_a_menu
 
-    def notAvailable(self, text):
+    @staticmethod
+    def notAvailable(text):
         # Append a string as a suffix
         return text + " (Not Available)"
 
-    def find_menu(self, index):
+    @staticmethod
+    def find_menu(index):
         # Get our current menu to check the items for
-        cur_menu_items = self.get_item(self.current_menu())
+        cur_menu_items = Builder.get_item(Builder.current_menu())
 
         # Check that our menu exists
         if(cur_menu_items == None):
             print("There was an error with grabbing the selected menu!")
-            self.set_current_menu("main")
+            Builder.set_current_menu("main")
             return False
         else:
             # Iterate through our items to find our index
             for i, (k, v) in enumerate(cur_menu_items.items(), 1):
                 if(index == i):
-                    return { "menu": self.is_menu(k), "ref": k, "name": v }
+                    return { "menu": Builder.is_menu(k), "ref": k, "name": v }
 
             # Return Data
             return False
@@ -191,46 +188,53 @@ class Builder():
         # Fall back returning statement
         return False
 
-    def show(self):
+    @staticmethod
+    def show():
         # Print a tree of the current built menu
-        print(self._menu)
+        print(Builder._menu)
 
-    def current_menu(self):
+    @staticmethod
+    def current_menu():
         # Return the current menu (top of the stack)
-        return self._current
+        return Builder._current
 
-    def set_current_menu(self, new_menu):
+    @staticmethod
+    def set_current_menu(new_menu):
         # Set the current menu
-        self._current = new_menu
-        return self.current_menu()
+        Builder._current = new_menu
+        return Builder.current_menu()
 
-    def add_menu_tree(self, ref):
+    @staticmethod
+    def add_menu_tree(ref):
         # Add to our current menu tree
-        self._tree.append(ref)
+        Builder._tree.append(ref)
 
-    def get_menu_tree(self):
+    @staticmethod
+    def get_menu_tree():
         # Get our current menu tree as a string, split by forward slash (/)
-        return "/".join([ m for m in self._tree ])
+        return "/".join([ m for m in Builder._tree ])
 
-    def go_back(self, reloading = False):
+    @staticmethod
+    def go_back(reloading = False):
         # Set our flag to true
-        self.just_called_back = True
+        Builder.just_called_back = True
 
         # Pop off the last item of the list
-        self._tree.pop()
+        Builder._tree.pop()
 
         # Set our current menu to the last element of the list
-        self._current = self._tree[-1]
+        Builder._current = Builder._tree[-1]
 
         # Display our menu
         if(not reloading):
-            return self.show_current_menu()
+            return Builder.show_current_menu()
 
         return None
 
-    def monitor_input(self):
+    @staticmethod
+    def monitor_input():
         # Check if we're force closing the menu or if we're reloading the menu
-        if(self._force_close):
+        if(Builder._force_close):
             return
 
         try:
@@ -243,33 +247,33 @@ class Builder():
                 raise KeyboardInterrupt
             elif(resp == ""):
                 # Invalid Input from User
-                return self.show_current_menu(True, True, "You have entered an invalid option")
+                return Builder.show_current_menu(True, True, "You have entered an invalid option")
 
             # Check that the menu option exists
             try:
                 # See if we're trying to go back a page
-                if(resp.lower() == "b" and self._current is not "main"):
-                    return self.go_back()
+                if(resp.lower() == "b" and Builder._current is not "main"):
+                    return Builder.go_back()
 
                 # Convert our request to an integer
                 req = int(resp)
 
                 # Find the requested menu
-                req_menu = self.find_menu(req)
+                req_menu = Builder.find_menu(req)
                 if(type(req_menu) == dict):
                     if(req_menu['menu']):
                         # Display our menu
-                        self.set_current_menu(req_menu['ref'])
-                        self.add_menu_tree(req_menu['ref'])
-                        self.show_current_menu()
+                        Builder.set_current_menu(req_menu['ref'])
+                        Builder.add_menu_tree(req_menu['ref'])
+                        Builder.show_current_menu()
                     else:
                         # Double check we're executing a function
-                        if(self.is_func(req_menu['ref'])):
+                        if(Builder.is_func(req_menu['ref'])):
                             # Clear Terminal
                             call("cls")
 
                             # Print Function Header
-                            if(self.game.debug):
+                            if(Builder.game.debug):
                                 print(" _______ ______ _   _ _   _ _____  _____ ")
                                 print("|__   __|  ____| \\ | | \\ | |_   _|/ ____|")
                                 print("   | |  | |__  |  \\| |  \\| | | | | (___  ")
@@ -279,33 +283,33 @@ class Builder():
                             print("——————————————————————————————————————————————————————————————")
 
                             # Execute
-                            retStr = self.call_func(req_menu['ref'])
+                            retStr = Builder.call_func(req_menu['ref'])
 
                             # Hold user (to display output from function)
                             if(retStr != "SKIP"):
                                 input("\n>>> Press <Return> to continue...")
 
-                            if(not self._force_reload):
-                                return self.show_current_menu()
+                            if(not Builder._force_reload):
+                                return Builder.show_current_menu()
                             else:
-                                self.game.menu = Menu(self.game)
-                                return self.game.menu.load(True)
+                                Builder.game.menu = Menu(Builder.game)
+                                return Builder.game.menu.load(True)
                         else:
-                            if(not self.item_exists(req_menu['ref'])):
-                                return self.show_current_menu(True, True, "That option is unavailable")
+                            if(not Builder.item_exists(req_menu['ref'])):
+                                return Builder.show_current_menu(True, True, "That option is unavailable")
                             else:
                                 if(req_menu['ref'] == "return"):
                                     # User wants to go back to the default menu
                                     input("\nYou are now going to the main menu!\nWarning: If data has not been added, rounds will not exist!")
                 else:
                     # Check if we pressed the Back button
-                    current_menu = self.get_item(self._current)
-                    if(req == (len(current_menu) + 1) and self._current is not "main"):
-                        return self.go_back()
-                    elif(req == (len(current_menu) + 1) and self._current is "main"):
-                        return self.game.exit() if not self._submenu else None 
+                    current_menu = Builder.get_item(Builder._current)
+                    if(req == (len(current_menu) + 1) and Builder._current is not "main"):
+                        return Builder.go_back()
+                    elif(req == (len(current_menu) + 1) and Builder._current is "main"):
+                        return Builder.game.exit()
                     else:
-                        return self.show_current_menu(True, True, "You have entered an invalid option")
+                        return Builder.show_current_menu(True, True, "You have entered an invalid option")
             # Exceptions (handled from outer-scope try/except)
             except KeyboardInterrupt:   raise KeyboardInterrupt
             except ValueError:          raise ValueError
@@ -314,20 +318,21 @@ class Builder():
         # Exceptions
         except KeyboardInterrupt:
             # User has terminated the program (Ctrl+C)
-            return self.game.exit() if not self._submenu else None
+            return Builder.game.exit()
         except ValueError:
             # User has entered an invalid value
-            return self.show_current_menu(True, True, "You have entered an invalid option")
+            return Builder.show_current_menu(True, True, "You have entered an invalid option")
         except Exception:
             # Handle other exceptions, and if debugging - show the error and halt the application
-            if(self.game.debug):
+            if(Builder.game.debug):
                 print("\nERROR:\nError Handled:\n{0}\n".format(traceback.print_exc()))
                 input("...continue")
             # Application has handled error for User
-            return self.show_current_menu(True, True)
+            return Builder.show_current_menu(True, True)
 
-    def show_current_menu(self, shouldClear = True, error = False, errorMsg = None):
-        cur_menu_items = self.get_item(self.current_menu())
+    @staticmethod
+    def show_current_menu(shouldClear = True, error = False, errorMsg = None):
+        cur_menu_items = Builder.get_item(Builder.current_menu())
 
         # Should we clear our terminal window?
         if(shouldClear):
@@ -343,28 +348,28 @@ class Builder():
         # Check that our Menu exists
         if(cur_menu_items == None):
             print("There was an error with grabbing the selected menu!")
-            print("Current menu: {}".format(self.current_menu()))
-            self.set_current_menu("main")
+            print("Current menu: {}".format(Builder.current_menu()))
+            Builder.set_current_menu("main")
         else:
             # Print menu header
-            print("{0} ({1})".format(self._title, self.get_menu_tree()))
+            print("{0} ({1})".format(Builder._title, Builder.get_menu_tree()))
             
             # Print out our menu
             for i, (k, v) in enumerate(cur_menu_items.items(), 1):
-                if(self.item_exists(k)):
-                    print("{0}. {1}{2}".format(i, v, (' -> ' if self.is_menu(k) else '')))
+                if(Builder.item_exists(k)):
+                    print("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else '')))
                 else:
-                    print(self.notAvailable("{0}. {1}{2}".format(i, v, (' -> ' if self.is_menu(k) else ''))))
+                    print(Builder.notAvailable("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''))))
 
                 # Does this key (ref) have info?
-                if(self.item_exists(k+"_info")):
-                    print("   - {0}{1}".format(self.get_item(k+"_info"), "" if (i == len(cur_menu_items.items()) and self.current_menu() is "main") else "\n"))
+                if(Builder.item_exists(k+"_info")):
+                    print("   - {0}{1}".format(Builder.get_item(k+"_info"), "" if (i == len(cur_menu_items.items()) and Builder.current_menu() is "main") else "\n"))
 
             # Print our back button
-            if(self.current_menu() is not "main"):
+            if(Builder.current_menu() is not "main"):
                 print("b. Back")
             else:
-                print("x. Exit and Save" if not self._submenu else "x. Exit back to Main Menu") 
+                print("x. Exit and Save")
 
             # Get input from user
-            self.monitor_input()
+            Builder.monitor_input()
