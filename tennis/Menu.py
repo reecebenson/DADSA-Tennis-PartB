@@ -52,8 +52,22 @@ class Menu():
                     for gdr in t_round.get_genders():
                         Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), gdr.title(), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr))
 
+                        ## CHECK GENDER IS AVAILABLE
+                        if(t_round.is_available(gdr)):
+                            Builder().add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr), partial(self.mark_as_available, season, tournament.get_name(), t_round.get_name(), gdr))
+
         # Show Menu
         Builder().show_current_menu()
+
+    def mark_as_available(self, season_name, tournament_name, round_name, gender):
+        round_id = int(round_name[-1:])
+
+        season = self.game.get_season(season_name)
+        tournament = season.get_tournament(tournament_name)
+        t_round = tournament.get_round(round_id + 1)
+        t_round.set_available(gender)
+        print("Set Season {}, Tour {}, Round {} for {} as available.".format(season_name, tournament_name, round_id, gender))
+        Builder().reload_menu()
 
 
 """Start of Menu Builder Class"""        
@@ -91,7 +105,7 @@ class Builder():
     @staticmethod
     def reload_menu():
         # We will pop() [go back] to avoid hitting any errors (maybe menu is replaced with a function, etc)
-        Builder.go_back(True)
+        #Builder.go_back(True)
 
         # Set our flag
         Builder._force_reload = True
@@ -303,7 +317,7 @@ class Builder():
                     if(req == (len(current_menu) + 1) and Builder._current is not "main"):
                         return Builder.go_back()
                     elif(req == (len(current_menu) + 1) and Builder._current is "main"):
-                        return self.game.exit()
+                        return Builder.game.exit()
                     else:
                         return Builder.show_current_menu(True, True, "You have entered an invalid option")
             # Exceptions (handled from outer-scope try/except)

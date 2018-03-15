@@ -66,6 +66,9 @@ class Game():
         elif(mode == "previous"):
             with open(sessionPath, 'rb') as session_file:
                 self.seasons = pickle.load(session_file)
+    
+    def get_season(self, season_name):
+        return self.seasons[season_name] if season_name in self.seasons else None
 
     def clear_screen(self):
         call("cls")

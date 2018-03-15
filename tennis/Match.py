@@ -17,6 +17,8 @@ class Match():
     player_one_object = None
     player_two_object = None
     winner = None
+    invalid = None
+    invalid_reason = None
 
     def __init__(self, _game, _gender, _parent, _json_data):
         self.name = "Season {0}, Tournament {1}, Round {2}, Match {3} of {4}'s.".format(_parent.parent.parent.get_id(), _parent.parent.get_name(), _parent.get_id(), len(_parent.matches[_gender]) + 1, _gender)
@@ -25,6 +27,9 @@ class Match():
         self.game = _game
         self.limit = _game.settings["score_limit"][_gender]
         self.json_data = _json_data
+
+        self.invalid = False
+        self.invalid_reason = None
 
         # Parse Match Data
         for i,name in enumerate(_json_data):
@@ -89,7 +94,9 @@ class Match():
 
         # Check Scores are not above limit
         if((self.player_one_score > score_limit) or (self.player_two_score > score_limit)):
-            self.game.clear_screen()
+            self.invalid = True
+            self.invalid_reason = "above_score_limit"
+            """self.game.clear_screen()
             if(self.player_one_score > score_limit):
                 print("Player One [{0}] has a score of {1} whereas the limit is {2}, please enter a new score.".format(self.player_one, self.player_one_score, score_limit))
                 player_one_new_score = input(">>> ")
@@ -104,11 +111,13 @@ class Match():
                 if(player_two_new_score.isdigit()):
                     self.player_two_score = int(player_two_new_score)
                 else:
-                    return self.validate_match(score_limit, round_id)
+                    return self.validate_match(score_limit, round_id)"""
 
         # Check Scores are not the same
         if(self.player_one_score is self.player_two_score):
-            self.game.clear_screen()
+            self.invalid = True
+            self.invalid_reason = "same_scores"
+            """self.game.clear_screen()
             print(self.get_text())
 
             # Check if we're on the last round
@@ -190,15 +199,16 @@ class Match():
                             self.player_two_score = score_limit
                         else:
                             print("Modifying this player will corrupt the data.")
-                        input(">>> Press <Return> to continue...")
+                        input(">>> Press <Return> to continue...")"""
 
         # Check there is atleast one winner
         winner_defined = True
         if((self.winner != self.player_one and self.winner != self.player_two) or (self.player_one_score != score_limit and self.player_two_score != score_limit)):
-            winner_defined = False
+            self.invalid = False
+            self.invalid_reason = "no_winner"
 
         # Ensure there is a winner for this match
-        if(not winner_defined):
+        """if(not winner_defined):
             self.game.clear_screen()
             if(round_id is self.game.settings['round_count']):
                 print(self.get_text())
@@ -230,6 +240,6 @@ class Match():
                         self.player_two_score = score_limit
                     else:
                         print("Modifying this player will corrupt the data, skipping...")
-                    input(">>> Press <Return> to continue...")
+                    input(">>> Press <Return> to continue...")"""
 
         return True

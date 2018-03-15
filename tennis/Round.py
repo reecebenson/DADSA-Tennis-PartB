@@ -13,6 +13,7 @@ class Round():
     json_data = None
     matches = None
     genders = None
+    genders_available = None
 
     def __init__(self, _game, _name, _parent, _json_data):
         self.parent = _parent
@@ -22,6 +23,7 @@ class Round():
         self.json_data = _json_data
         self.matches = { }
         self.genders = [ ]
+        self.genders_available = { }
 
         # Read in Gender Round Data
         for gender in _json_data:
@@ -31,6 +33,7 @@ class Round():
             if(gender not in self.matches):
                 self.genders.append(gender)
                 self.matches.update({ gender: [ ] })
+                self.genders_available.update({ gender: True if self.id is 1 else False })
 
             # Read in Round
             for match in gender_data:
@@ -64,3 +67,16 @@ class Round():
 
     def get_winners(self, gender):
         return [ m.get_winner() for m in self.get_matches(gender) ]
+
+    def is_available(self, gender):
+        return self.genders_available[gender]
+
+    def set_available(self, gender):
+        if(gender in self.genders_available):
+            self.genders_available[gender] = True
+        return None
+
+    def set_unavailable(self, gender):
+        if(gender in self.genders_available):
+            self.genders_available[gender] = False
+        return None
