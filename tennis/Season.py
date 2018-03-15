@@ -23,6 +23,7 @@ class Season():
         self.json_data = _json_data
         self.tournaments = { }
         self.players = { }
+        self.genders = [ ]
 
         # Set our Players
         self.set_players(_players)
@@ -56,6 +57,10 @@ class Season():
     def set_players(self, player_list):
         for gender in player_list[self.get_name()]:
             # Add Gender to Genders List
+            if(gender not in self.genders):
+                self.genders.append(gender)
+
+            # Add Gender to Players List
             if(gender not in self.players):
                 self.players.update({ gender: [ ] })
 

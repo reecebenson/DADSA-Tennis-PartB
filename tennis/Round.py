@@ -3,6 +3,8 @@
  # Created by Reece Benson (16021424)
 """
 from tennis import Match
+from tennis.Menu import Builder
+from functools import partial
 
 class Round():
     # Variables
@@ -80,3 +82,13 @@ class Round():
         if(gender in self.genders_available):
             self.genders_available[gender] = False
         return None
+
+    def run(self, gender):
+        if(self.game.debug):
+            print("Emulating {}, {}, Round {}, {}.\n".format(self.parent.parent.get_name(), self.parent.get_name(), self.get_id(), gender))
+
+        # Small Menu
+        builder = Builder().init(self.game, False, False, True)
+        builder.add_menu("main", "Input by File", "input_file")
+        builder.add_menu("main", "Input manually", "input_manual")
+        builder.show_current_menu()

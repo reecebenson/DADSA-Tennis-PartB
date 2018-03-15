@@ -11,6 +11,7 @@ class Tournament():
     parent = None
     json_data = None
     rounds = None
+    gender = None
 
     def __init__(self, _game, _name, _parent, _json_data):
         self.name = _name
@@ -33,6 +34,9 @@ class Tournament():
 
     def get_name(self):
         return self.name
+
+    def get_gender(self):
+        return self.gender
 
     def get_rounds(self):
         return [ self.rounds[r] for r in self.rounds ]

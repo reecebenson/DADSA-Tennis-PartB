@@ -22,14 +22,14 @@ class App():
         self.game = Game.Game(self)
 
         # Loading Mode
-        Builder().init(self.game, False)
-        Builder().add_menu("main", "Start a new session", "new_session")
-        Builder().add_menu("main", "Load previous session", "previous_session")
-        Builder().add_func("main", "new_session", partial(self.new_session))
-        Builder().add_func("main", "previous_session", partial(self.previous_session))
+        builder = Builder().init(self.game, False)
+        builder.add_menu("main", "Start a new session", "new_session")
+        builder.add_menu("main", "Load previous session", "previous_session")
+        builder.add_func("main", "new_session", partial(self.new_session, builder))
+        builder.add_func("main", "previous_session", partial(self.previous_session, builder))
 
         # Show menu
-        Builder().show_current_menu()
+        builder.show_current_menu()
 
         ###############################################################################
 
@@ -44,20 +44,20 @@ class App():
         self.exit()
 
     # Loading Mode - New Session
-    def new_session(self):
+    def new_session(self, b):
         print("Starting a new session will remove all previous data.")
         resp = input("Are you sure you would like to start a new session? [y/N]: ")
         if(resp.lower() == "y"):
             self.loading_mode = "new"
-            Builder().close_menu()
+            b.close_menu()
         elif(resp.lower() == "n"):
             pass
         return "SKIP"
 
     # Loading Mode - Previous Session
-    def previous_session(self):
+    def previous_session(self, b):
         self.loading_mode = "previous"
-        Builder().close_menu()
+        b.close_menu()
         return "SKIP"
 
     # A method which exits the program after the user has pressed the Return key
