@@ -3,6 +3,7 @@
  # Created by Reece Benson (16021424)
 """
 import traceback
+from tennis.Colours import Colours
 from functools import partial
 from os import system as call
 from collections import OrderedDict
@@ -164,7 +165,7 @@ class Builder():
     @staticmethod
     def notAvailable(text):
         # Append a string as a suffix
-        return text + " (Not Available)"
+        return text + " {0}(Not Available){1}".format(Colours.FAIL, Colours.ENDC)
 
     @staticmethod
     def find_menu(index):
@@ -325,7 +326,7 @@ class Builder():
         except Exception:
             # Handle other exceptions, and if debugging - show the error and halt the application
             if(Builder.game.debug):
-                print("\nERROR:\nError Handled:\n{0}\n".format(traceback.print_exc()))
+                print("{1}\nERROR:\nError Handled:\n{0}\n{2}".format(traceback.print_exc(), Colours.FAIL, Colours.ENDC))
                 input("...continue")
             # Application has handled error for User
             return Builder.show_current_menu(True, True)
@@ -341,35 +342,32 @@ class Builder():
         # Have we got an error?
         if(error):
             if(errorMsg == None):
-                print("\nError:\nThere was an error performing your request.\n")
+                print("\n{0}{1}Error:{2}\n{0}There was an error performing your request.{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
             else:
-                print("\nError:\n{0}.\n".format(errorMsg))
+                print("\n{2}Error:{3}\n{1}{0}.{3}\n".format(errorMsg, Colours.FAIL, Colours.BOLD, Colours.ENDC))
 
         # Check that our Menu exists
         if(cur_menu_items == None):
-            print("There was an error with grabbing the selected menu!")
+            print("{}There was an error with grabbing the selected menu!{}".format(Colours.FAIL, Colours.ENDC))
             print("Current menu: {}".format(Builder.current_menu()))
             Builder.set_current_menu("main")
         else:
             # Print menu header
-            print("{0} ({1})".format(Builder._title, Builder.get_menu_tree()))
+            print("{2}{0}{3} ({4}{1}{3})".format(Builder._title, Builder.get_menu_tree(), Colours.BOLD, Colours.ENDC, Colours.GRAY))
             
             # Print out our menu
             for i, (k, v) in enumerate(cur_menu_items.items(), 1):
                 if(Builder.item_exists(k)):
-                    print("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else '')))
+                    print("{3}{0}{4}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''), Colours.BOLD + Colours.OKGREEN, Colours.ENDC))
                 else:
-                    print(Builder.notAvailable("{0}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''))))
+                    print(Builder.notAvailable("{3}{0}{4}. {1}{2}".format(i, v, (' -> ' if Builder.is_menu(k) else ''), Colours.BOLD + Colours.OKGREEN, Colours.ENDC)))
 
                 # Does this key (ref) have info?
                 if(Builder.item_exists(k+"_info")):
                     print("   - {0}{1}".format(Builder.get_item(k+"_info"), "" if (i == len(cur_menu_items.items()) and Builder.current_menu() is "main") else "\n"))
 
             # Print our back button
-            if(Builder.current_menu() is not "main"):
-                print("b. Back")
-            else:
-                print("x. Exit and Save")
+            print("{0}".format("{0}b{1}. Back".format(Colours.FAIL, Colours.ENDC) if Builder.current_menu() is not "main" else "{0}x{1}. Exit and Save".format(Colours.FAIL, Colours.ENDC)))
 
             # Get input from user
             Builder.monitor_input()

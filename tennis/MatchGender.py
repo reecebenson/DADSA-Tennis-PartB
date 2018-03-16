@@ -5,6 +5,7 @@
 from tennis import Match
 from tennis.Menu import Menu
 from tennis.Menu import Builder
+from tennis.Colours import Colours
 from functools import partial
 
 class MatchGender():
@@ -122,5 +123,42 @@ class MatchGender():
         input(">>> Press <Return> to continue...")
 
     def input_manual(self):
-        print("something else")
-        input(">>> Press <Return> to continue...")
+
+        # Players
+        pop_player_list = self.get_players()
+
+        # Print Instructions
+        while(len(pop_player_list) is not 0):
+            # Clear Screen
+            self.game.clear_screen()
+
+            # Print Player List
+            c = 0
+            for p in pop_player_list:
+                print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p), end='{}'.format("\n" if (((c+1) % 4) == 0) else " "))
+                c += 1
+
+            # Instructions
+            print("\nPlease enter 2 players identifiers in the format: \"00,14\":")
+            resp = input(">>> ")
+            player_names = resp.replace(" ", "").split(",")
+
+            # Pop Players Names from the list
+            if(player_names[0] in pop_player_list):
+                pop_player_list.remove(player_names[0])
+            else:
+                continue
+
+            if(player_names[1] in pop_player_list):
+                pop_player_list.remove(player_names[1])
+            else:
+                pop_player_list.append(player_names[0])
+                continue
+
+            print("\nPlease enter the scores for {} vs. {}: \"2,1\":".format())
+            resp = input(">>> ")
+            player_names = resp.replace(" ", "").split(",")
+
+            
+
+        input(Colours.OKGREEN + "\n>>> Press <Return> to continue..." + Colours.ENDC)

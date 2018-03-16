@@ -23,7 +23,7 @@ class App():
 
         # Loading Mode
         Builder().init(self.game, False)
-        Builder().add_menu("main", "Start a new session", "new_session")
+        Builder().add_menu("main", "\x1B[3mStart a new session", "new_session")
         Builder().add_menu("main", "Load previous session", "previous_session")
         Builder().add_func("main", "new_session", partial(self.new_session))
         Builder().add_func("main", "previous_session", partial(self.previous_session))
