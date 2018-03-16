@@ -15,15 +15,17 @@ class Season():
     json_data = None
     tournaments = None
     players = None
+    available = None
 
     def __init__(self, _game, _name, _json_data, _players):
         self.name = _name
-        self.id = _name[-1:]
+        self.id = int(_name[-1:])
         self.game = _game
         self.json_data = _json_data
         self.tournaments = { }
         self.players = { }
         self.genders = [ ]
+        self.available = True if self.id == 1 else False
 
         # Set our Players
         self.set_players(_players)
@@ -53,6 +55,12 @@ class Season():
 
     def get_tournament(self, tournament_name):
         return self.tournaments[tournament_name]
+
+    def is_available(self):
+        return self.available
+
+    def set_availability(self, state):
+        self.available = state
 
     def set_players(self, player_list):
         for gender in player_list[self.get_name()]:

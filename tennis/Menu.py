@@ -32,9 +32,16 @@ class Menu():
 
         ## SEASONS ---------------------------------------------------------------------------------------------------------------------------
         for season in self.game.seasons:
+            # Variables
             season_obj = self.game.seasons[season]
             season_id = season[-1:]
-            Builder().add_menu("loadgame", "Season {}".format(season_id), "view_{}".format(season))
+
+            # Add Season
+            Builder().add_menu("loadgame", "Season {}{}".format(season_id, Colours.OKGREEN + " (Available)" + Colours.ENDC if season_obj.is_available() else ""), "view_{}".format(season))
+
+            # Check that this season is available
+            if(not season_obj.is_available()):
+                continue
 
             ## DEBUG -------------------------------------------------------------------------------------------------------------------------
             if(menu_debug):

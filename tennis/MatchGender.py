@@ -84,22 +84,21 @@ class MatchGender():
         return False
 
     def run(self, error=False):
-        if(self.game.debug):
-            print("Emulating {}, {}, Round {}, {}.\n".format(self.parent.parent.parent.get_name(), self.parent.parent.get_name(), self.parent.get_id(), self.gender))
-
         # Clear Screen
         self.game.clear_screen()
 
         # Show Error
         if(error):
-            print("\nError:\nYou have entered an invalid option.\n\n")
+            print("\n" + Colours.BOLD + "Error:" + Colours.ENDC + "\n" + Colours.FAIL + "You have entered an invalid option.\n" + Colours.ENDC)
 
         # Menu Options
-        print("Please select an option:")
-        print("1. View Round{}".format("" if self.is_complete() else " (Not Available)"))
-        print("2. Input using file data{}".format("" if (self.is_input_file_allowed() and not self.is_complete()) else " (Not Available)"))
-        print("3. Input data manually{}".format("" if not self.is_complete() else " (Not Available)"))
-        print("x. Save and Return")
+        print(Colours.BOLD + "Please select an option:" + Colours.ENDC)
+        print(Colours.OKGREEN + "1" + Colours.ENDC + ". View Round{}".format("" if self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
+        print(Colours.OKGREEN + "2" + Colours.ENDC + ". View Prize Money{}".format("" if self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
+        print(Colours.OKGREEN + "3" + Colours.ENDC + ". View Ranking Points{}".format("" if self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
+        print(Colours.OKGREEN + "4" + Colours.ENDC + ". Input using file data{}".format("" if (self.is_input_file_allowed() and not self.is_complete()) else Colours.FAIL + " (Not Available)" + Colours.ENDC))
+        print(Colours.OKGREEN + "5" + Colours.ENDC + ". Input data manually{}".format("" if not self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
+        print(Colours.FAIL + "x" + Colours.ENDC + ". Save and Return")
 
         # Menu Response
         resp = input(">>> ")
@@ -110,11 +109,21 @@ class MatchGender():
                 else:
                     self.run(True)
             elif(resp == "2"):
+                if(self.is_complete()):
+                    self.view_prize_money()
+                else:
+                    self.run(True)
+            elif(resp == "3"):
+                if(self.is_complete()):
+                    self.view_ranking_points()
+                else:
+                    self.run(True)
+            elif(resp == "4"):
                 if(self.is_input_file_allowed() and not self.is_complete()):
                     self.input_file()
                 else:
                     self.run(True)
-            elif(resp == "3"):
+            elif(resp == "5"):
                 if(not self.is_complete()):
                     self.input_manual()
                 else:
@@ -132,17 +141,32 @@ class MatchGender():
         return self.run()
 
     def view(self):
-        print("Running matches...")
+        # Clear Screen
+        self.game.clear_screen()
 
         # Validate Matches
         for match in self.get_matches():
             match.validate_match(self.game.settings["score_limit"][self.gender], self.parent.get_id(), True)
 
         # Print Matches
+        print("Viewing Matches for Season {0}, Tournament {1}, Round {2} of {3}s...".format(self.parent.parent.parent.get_id(), self.parent.parent.get_name(), self.parent.get_id(), self.get_gender()))
         for match in self.get_matches():
             print(match.get_match_text())
 
-        input("hold")
+        # Return
+        input("\n>>> Press <Return> to continue...")
+
+    def view_prize_money(self):
+        print("Prize Money!")
+
+        input("\n>>> Press <Return> to continue...")
+        pass
+    
+    def view_ranking_points(self):
+        print("Ranking Points!")
+
+        input("\n>>> Press <Return> to continue...")
+        pass
 
     def input_file(self):
         # Validate Matches
@@ -153,6 +177,7 @@ class MatchGender():
         self.game.clear_screen()
 
         # Print Matches
+        print("Inputting matches for Season {0}, Tournament {1}, Round {2} of {3}s...".format(self.parent.parent.parent.get_id(), self.parent.parent.get_name(), self.parent.get_id(), self.get_gender()))
         for match in self.get_matches():
             print(match.get_match_text())
 

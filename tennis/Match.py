@@ -2,6 +2,7 @@
  # Data Structures and Algorithms - Part B
  # Created by Reece Benson (16021424)
 """
+from tennis.Colours import Colours
 
 class Match():
     # Variables
@@ -21,7 +22,7 @@ class Match():
     invalid_reason = None
 
     def __init__(self, _game, _gender, _parent, _json_data):
-        self.name = "Season {0}, Tournament {1}, Round {2}, Match {3} of {4}'s.".format(_parent.parent.parent.parent.get_id(), _parent.parent.parent.get_name(), _parent.parent.get_id(), len(_parent.matches) + 1, _gender)
+        self.name = Colours.BOLD + "Season {0}, Tournament {1}, Round {2}, Match {3} of {4}s.".format(_parent.parent.parent.parent.get_id(), _parent.parent.parent.get_name(), _parent.parent.get_id(), len(_parent.matches) + 1, _gender) + Colours.ENDC
         self.parent = _parent
         self.gender = _gender
         self.game = _game
@@ -68,7 +69,7 @@ class Match():
         return self.winner
 
     def get_match_text(self, full=False):
-        return "{5}[{0}] {1} - {2} [{3}] -- Winner: {4}".format(self.get_player_one()[0], self.get_player_one()[1], self.get_player_two()[1], self.get_player_two()[0], self.get_winner(), "" if not full else "{0}, Round {1} -- ".format(self.parent.parent.parent.get_name(), self.parent.parent.get_id()))
+        return "{5}[{6}{0}{7}] {1} - {2} [{6}{3}{7}] -- Winner: {8}{4}{7}".format(self.get_player_one()[0], self.get_player_one()[1], self.get_player_two()[1], self.get_player_two()[0], self.get_winner(), "" if not full else "{0}, Round {1} -- ".format(self.parent.parent.parent.get_name(), self.parent.parent.get_id()), Colours.OKBLUE, Colours.ENDC, Colours.OKGREEN)
     
     def get_match_as_json(self):
         return { self.player_one: self.player_one_score, self.player_two: self.player_two_score, "winner": self.winner }
@@ -144,7 +145,7 @@ class Match():
 
                 # Check if we're on the last round
                 if(round_id is self.game.settings['round_count']):
-                    print("Player One [{0}] and Player Two [{1}] have the same score of {2}, please enter their new scores.".format(self.player_one, self.player_two, self.player_one_score))
+                    print("Player One [{3}{0}{4}] and Player Two [{3}{1}{4}] have the same score of {2}, please enter their new scores.".format(self.player_one, self.player_two, self.player_one_score, Colours.OKBLUE, Colours.ENDC))
                     self.player_scores_manual_input()
 
                 # Check in the next round for the winner
@@ -161,7 +162,7 @@ class Match():
                                 available_player = p
                                 break
 
-                    print("Player One [{0}] and Player Two [{1}] have the same score of {2}.\nWould you like to manually input their scores or find the winner from the next round? [manual/FIND]".format(self.player_one, self.player_two, self.player_one_score))
+                    print("Player One [{3}{0}{4}] and Player Two [{3}{1}{4}] have the same score of {2}.".format(self.player_one, self.player_two, self.player_one_score, Colours.OKBLUE, Colours.ENDC))
                     self.find_available_player(score_limit, round_id)
 
         # Check there is atleast one winner
@@ -204,7 +205,7 @@ class Match():
                     break
 
             if(available_player is not None):
-                print("Available Player: {0}\n\nThe winner of this match will be set to {0}, confirm? [Y/n]".format(available_player))
+                print("Available Player: {1}{0}{2}\n\nThe winner of this match will be set to {1}{0}{2}, confirm? [Y/n]".format(available_player, Colours.OKBLUE, Colours.ENDC))
                 resp = input(">>> ")
                 if(resp == "y" or resp == ""):
                     self.player_scores_find(available_player, score_limit, round_id)
@@ -257,7 +258,7 @@ class Match():
                             match_gender = t_round.get_gender(self.gender)[1]
                             match_gender.set_input_file_state(False)
                 else:
-                    print("That winner is perfect, thanks.")
+                    print("\nThe winner you have chosen has kept the future rounds data complete, you will have the ability to continue reading from the file for future rounds.")
                 input(">>> Press <Return> to continue...")
             else:
                 print("too high of a round", self.parent.parent.get_id(), next_round_id)
