@@ -67,7 +67,7 @@ class MatchGender():
 
         # Show Error
         if(error):
-            print("You have entered an invalid option.\n\n")
+            print("\nError:\nYou have entered an invalid option.\n\n")
 
         # Menu Options
         print("Please select an option:")
@@ -87,11 +87,15 @@ class MatchGender():
                 self.input_manual()
             else:
                 return self.run(True)
-        elif(resp == "x"):
+        elif(resp == "x" or resp == "b"):
             self.game.save()
+            Builder().reload_menu()
+            return "SKIP"
         else:
             return self.run(True)
-        Builder().reload_menu()
+
+        # Recursive Menu
+        return self.run()
 
     def input_file(self):
         # Validate Matches
@@ -115,6 +119,8 @@ class MatchGender():
         
         # Go back on the Main Menu
         Builder().go_back(True)
+        input(">>> Press <Return> to continue...")
 
-    def input_manual(self, gender):
+    def input_manual(self):
         print("something else")
+        input(">>> Press <Return> to continue...")

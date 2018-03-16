@@ -87,10 +87,12 @@ class Game():
         call("cls")
 
     def save(self):
+        # Debug
+        if(self.debug):
+            print("Saving session...")
+
         # Save current session
-        print("Saving session...")
         File().save_session(self.seasons)
-        print("done.")
 
     def exit(self):
         # Save

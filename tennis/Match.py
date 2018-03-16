@@ -253,8 +253,9 @@ class Match():
                     print("\nYou have selected {0}, who is not a valid participant within the next round.\nDue to this, all future rounds within this tournament will require manual input.".format(self.winner))
                     # Set Manual Input for next rounds
                     for t_round in self.parent.parent.parent.get_rounds():
-                        match_gender = t_round.get_gender(self.gender)[1]
-                        match_gender.set_input_file_state(False)
+                        if(t_round.get_id() > round_id):
+                            match_gender = t_round.get_gender(self.gender)[1]
+                            match_gender.set_input_file_state(False)
                 else:
                     print("That winner is perfect, thanks.")
                 input(">>> Press <Return> to continue...")
