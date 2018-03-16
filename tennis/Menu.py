@@ -51,7 +51,7 @@ class Menu():
 
                     ## GENDERS ---------------------------------------------------------------------------------------------------------------
                     for gdr in t_round.get_genders():
-                        Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), gdr[0].title(), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]))
+                        Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "{}{}".format(gdr[0].title(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if gdr[1].is_complete() else (Colours.FAIL + " (Incomplete)" + Colours.ENDC if gdr[1].is_available() else "")), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]))
 
                         ## CHECK GENDER IS AVAILABLE
                         if(gdr[1].is_available()):

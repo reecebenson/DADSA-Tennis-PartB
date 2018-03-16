@@ -212,12 +212,12 @@ class Match():
                     self.player_scores_manual_input(score_limit, round_id)
 
     def player_scores_find(self, available_player, score_limit, round_id):
-        if(available_player is self.player_one):
+        if(available_player == self.player_one):
             self.winner = self.player_one
             self.player_one_score = score_limit
             self.player_two_score = score_limit - 1
             return True
-        elif(available_player is self.player_two):
+        elif(available_player == self.player_two):
             self.winner = self.player_two
             self.player_one_score = score_limit - 1
             self.player_two_score = score_limit
