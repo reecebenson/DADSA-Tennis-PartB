@@ -95,8 +95,8 @@ class Season():
             for r in t.get_rounds():
                 for g in r.get_genders():
                     # Validate Matches
-                    for m in r.get_matches(g):
-                        m.validate_match(self.game.settings['score_limit'][g], r.get_id())
+                    for m in g[1].get_matches():
+                        m.validate_match(self.game.settings['score_limit'][g[1].get_gender()], r.get_id())
 
             # Save Data
             self.save()
@@ -119,7 +119,22 @@ class Season():
                         _matches = [ ]
                         _count = 0
                         for m in _round[gender]:
-                            _matches.append(self.get_tournament(t).get_round(_round_id).get_matches(gender)[_count].get_match_as_json())
+                            """__t = self.get_tournament(t)
+                            print("__t", __t)
+                            __r = __t.get_round(_round_id)
+                            print("__r", __r)
+                            __g = __r.get_gender(gender)
+                            print("__g", __g)
+                            __gg = __g[1]
+                            print("__gg", __gg)
+                            __m = __gg.get_matches()
+                            print("__m", __m)
+                            __mc = __m[_count]
+                            print("__mc", __mc)
+                            __mj = __mc.get_match_as_json()
+                            print("__mj", __mj)"""
+                            
+                            _matches.append(self.get_tournament(t).get_round(_round_id).get_gender(gender)[1].get_matches()[_count].get_match_as_json())
                             _count += 1
                         season_data["tournaments"][t]["rounds"]["round_{0}".format(_round_id)][gender] = _matches
 

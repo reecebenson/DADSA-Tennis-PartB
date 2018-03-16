@@ -21,7 +21,7 @@ class Match():
     invalid_reason = None
 
     def __init__(self, _game, _gender, _parent, _json_data):
-        self.name = "Season {0}, Tournament {1}, Round {2}, Match {3} of {4}'s.".format(_parent.parent.parent.get_id(), _parent.parent.get_name(), _parent.get_id(), len(_parent.matches[_gender]) + 1, _gender)
+        self.name = "Season {0}, Tournament {1}, Round {2}, Match {3} of {4}'s.".format(_parent.parent.parent.parent.get_id(), _parent.parent.parent.get_name(), _parent.parent.get_id(), len(_parent.matches) + 1, _gender)
         self.parent = _parent
         self.gender = _gender
         self.game = _game
@@ -46,8 +46,8 @@ class Match():
                 print("Something went wrong with the match data: {0}".format(_json_data))
 
         # Apply Player Objects
-        self.player_one_object = self.parent.parent.parent.get_player(self.player_one, _gender)
-        self.player_two_object = self.parent.parent.parent.get_player(self.player_two, _gender)
+        self.player_one_object = self.parent.parent.parent.parent.get_player(self.player_one, _gender)
+        self.player_two_object = self.parent.parent.parent.parent.get_player(self.player_two, _gender)
 
         if(_game.debug):
             print("[ROUND]: Match '{0}-{1}' [{2}] made! [{3}:{5} -- {4}:{6}]".format(self.player_one, self.player_two, self.gender, self.player_one_object, self.player_two_object, self.player_one_object.get_name(), self.player_two_object.get_name()))
@@ -68,7 +68,7 @@ class Match():
         return self.winner
 
     def get_match_text(self, full=False):
-        return "{5}[{0}] {1} - {2} [{3}] -- Winner: {4}".format(self.get_player_one()[0], self.get_player_one()[1], self.get_player_two()[1], self.get_player_two()[0], self.get_winner(), "" if not full else "{0}, Round {1} -- ".format(self.parent.parent.get_name(), self.parent.get_id()))
+        return "{5}[{0}] {1} - {2} [{3}] -- Winner: {4}".format(self.get_player_one()[0], self.get_player_one()[1], self.get_player_two()[1], self.get_player_two()[0], self.get_winner(), "" if not full else "{0}, Round {1} -- ".format(self.parent.parent.parent.get_name(), self.parent.parent.get_id()))
     
     def get_match_as_json(self):
         return { self.player_one: self.player_one_score, self.player_two: self.player_two_score, "winner": self.winner }
@@ -150,8 +150,8 @@ class Match():
                 # Check in the next round for the winner
                 else:
                     # Get next rounds winner
-                    this_round_winners = self.parent.get_winners(self.gender)
-                    next_round_players = self.parent.parent.get_round(round_id + 1).get_players(self.gender)
+                    this_round_winners = self.parent.get_winners()
+                    next_round_players = self.parent.parent.parent.get_round(round_id + 1).get_gender(self.gender)[1].get_players()
                     available_player = None
 
                     if(this_round_winners and next_round_players):
@@ -192,8 +192,8 @@ class Match():
 
     def find_available_player(self, score_limit, round_id):
         # Get next rounds winner
-        this_round_winners = self.parent.get_winners(self.gender)
-        next_round_players = self.parent.parent.get_round(round_id + 1).get_players(self.gender)
+        this_round_winners = self.parent.get_winners()
+        next_round_players = self.parent.parent.parent.get_round(round_id + 1).get_gender(self.gender)[1].get_players()
         available_player = None
 
         if(this_round_winners and next_round_players):
@@ -246,15 +246,19 @@ class Match():
             # Validate Next Rounds
             next_round_id = round_id + 1
             if(next_round_id <= self.game.settings['round_count']):
-                next_round_players = self.parent.parent.get_round(next_round_id).get_players(self.gender)
+                next_round_players = self.parent.parent.parent.get_round(next_round_id).get_gender(self.gender)[1].get_players()
 
                 # Check that the winner is within the next round
                 if(self.winner not in next_round_players):
                     print("\nYou have selected {0}, who is not a valid participant within the next round.\nDue to this, all future rounds within this tournament will require manual input.".format(self.winner))
+                    # Set Manual Input for next rounds
+                    for t_round in self.parent.parent.parent.get_rounds():
+                        match_gender = t_round.get_gender(self.gender)[1]
+                        match_gender.set_input_file_state(False)
                 else:
                     print("That winner is perfect, thanks.")
                 input(">>> Press <Return> to continue...")
             else:
-                print("too high of a round", self.parent.get_id(), next_round_id)
+                print("too high of a round", self.parent.parent.get_id(), next_round_id)
         else:
             return self.validate_match(score_limit, round_id)
