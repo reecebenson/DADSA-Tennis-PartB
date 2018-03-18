@@ -122,6 +122,7 @@ class MatchGender():
         self.complete_scores = [ ]
 
         # Get Allocation Score
+        ##TODO: The difference between each one needs to be done here (as Lewis said) so that multipliers work, etc etc etc etc, i hate my life k
         score_to_add = list(self.game.settings['ranking_points'].keys())[::-1][self.parent.get_id() - 1]
 
         # Get Previous Rounds Score
