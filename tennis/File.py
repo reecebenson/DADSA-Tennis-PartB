@@ -5,7 +5,7 @@
 # Imports
 import json
 import pickle
-from tennis.SmallJSON import SmallJSON
+from tools.SmallJSON import SmallJSON
 
 class File():
     @staticmethod

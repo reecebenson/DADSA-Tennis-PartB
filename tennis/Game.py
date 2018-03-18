@@ -38,6 +38,10 @@ class Game():
         # Load Settings
         with open(settingsPath) as settings_file:
             self.settings = json.load(settings_file)
+        
+        # Load Ranking Points
+        with open(rankingPointsPath) as ranking_points_file:
+            self.settings['ranking_points'] = json.load(ranking_points_file)
 
         # Load New Data
         if(mode == "new"):

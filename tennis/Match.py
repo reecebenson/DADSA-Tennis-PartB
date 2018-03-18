@@ -71,6 +71,29 @@ class Match():
     def get_match_text(self, full=False):
         return "{5}[{6}{0}{7}] {1} - {2} [{6}{3}{7}] -- Winner: {8}{4}{7}".format(self.get_player_one()[0], self.get_player_one()[1], self.get_player_two()[1], self.get_player_two()[0], self.get_winner(), "" if not full else "{0}, Round {1} -- ".format(self.parent.parent.parent.get_name(), self.parent.parent.get_id()), Colours.OKBLUE, Colours.ENDC, Colours.OKGREEN)
     
+    def get_match_bonuses(self):
+        # Variables
+        bonuses = self.game.settings["score_bonus"][self.gender]
+
+        # Define Scores as Format (x,y)
+        scores = "{0},{1}".format(self.player_one_score, self.player_two_score)
+
+        # Get Score Response
+        if(scores in bonuses):
+            return (bonuses[scores][0], bonuses[scores][1])
+        return None
+
+    def get_match_bonuses_text(self):
+        # Variables
+        bonuses = self.game.settings["score_bonus"][self.gender]
+
+        # Define Scores as Format (x,y)
+        scores = "{0},{1}".format(self.player_one_score, self.player_two_score)
+
+        # Get Score Response
+        if(scores in bonuses):
+            print("\tBonus Found! {0} for {1}".format(bonuses[scores][0], bonuses[scores][1]))
+
     def get_match_as_json(self):
         return { self.player_one: self.player_one_score, self.player_two: self.player_two_score, "winner": self.winner }
 
