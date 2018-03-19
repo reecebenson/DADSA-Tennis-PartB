@@ -139,11 +139,11 @@ class MatchGender():
             # Bonus
             bonuses = match.get_match_bonuses()
             bonus = bonuses[0] if bonuses is not None else 1
-            match_add_score = int(score_to_add) * bonus
+            match_add_score = int(score_to_add)
 
             print("Winner: {}, score to set: {} ({})".format(match.get_winner(), match_add_score, "No Bonus" if bonus == 1 else "Bonus"))
-            self.complete_scores.append((match.get_player_one()[0], match_add_score if match.get_winner() == match.get_player_one()[0] else 0))
-            self.complete_scores.append((match.get_player_two()[0], match_add_score if match.get_winner() == match.get_player_two()[0] else 0))
+            self.complete_scores.append((match.get_player_one()[0], match_add_score if match.get_winner() == match.get_player_one()[0] else 0, bonus))
+            self.complete_scores.append((match.get_player_two()[0], match_add_score if match.get_winner() == match.get_player_two()[0] else 0, bonus))
         pass
 
     def run(self, error=False):
@@ -231,13 +231,7 @@ class MatchGender():
         input("\n>>> Press <Return> to continue...")
 
     def view_prize_money(self):
-        print("Prize Money!")
-
-        input("\n>>> Press <Return> to continue...")
-        pass
-    
-    def view_ranking_points(self):
-        # Temporary List of Player Scores, being updated each time for each completed round
+        # Temporary Player Scores
         player_scores = [ ]
 
         # Clear Screen
@@ -264,10 +258,6 @@ class MatchGender():
                     if(p['player'].get_name() == player):
                         player_scores[i] = { "score": p['score'] + score, "player": self.parent.parent.parent.get_player(player, self.gender) }
                         player_found = True
-
-                    # Is this the last round? If so, add tournament multiplier
-                    """if(t_round.get_id() == self.game.settings['round_count']):
-                        player_scores[i] = { "score": p['score'] * t_round.parent.get_difficulty(), "player": self.parent.parent.parent.get_player(player, self.gender) }"""
                     i += 1
 
                 # Add Player
@@ -275,7 +265,6 @@ class MatchGender():
                     player_scores.append({ "score": score, "player": self.parent.parent.parent.get_player(player, self.gender) })
 
         # Title
-        print(player_scores)
         print("Viewing Ranking Points for Season {0}, Tournament {1}, Round {2} of {3}s...".format(self.parent.parent.parent.get_id(), self.parent.parent.get_name(), self.parent.get_id(), self.get_gender()))
         overall_place = 1
         in_order = QuickSort(player_scores)
@@ -285,7 +274,65 @@ class MatchGender():
             score = p['score']
 
             # Print Data
-            print("#{0}: {1} — Score: {2:002.1f}".format(f"{overall_place:02}", player.get_name(), score))
+            print("#{0}: {1} — Prize Money: {2:002.2f}".format(f"{overall_place:02}", player.get_name(), self.parent.parent.prize_money[str(overall_place)] if str(overall_place) in self.parent.parent.prize_money else 0))
+            overall_place += 1
+
+        input("\n>>> Press <Return> to continue...")
+        pass
+    
+    def view_ranking_points(self):
+        # Temporary List of Player Scores, being updated each time for each completed round
+        player_scores = [ ]
+
+        # Clear Screen
+        self.game.clear_screen()
+
+        # Go through each completed round
+        for t_round in self.parent.parent.get_rounds():
+            # Get Round Data
+            mg = t_round.get_gender(self.gender)[1]
+
+            # Break if Round is incomplete
+            if(not mg.is_complete()):
+                break
+
+            # Set the scores
+            for player_score in mg.complete_scores:
+                player = player_score[0]
+                score = float(player_score[1])
+                bonus = float(player_score[2])
+
+                # Find Player
+                player_found = False
+                i = 0
+                for p in player_scores:
+                    if(p['player'].get_name() == player):
+                        player_scores[i] = { "score": p['score'] + (score * bonus), "player": self.parent.parent.parent.get_player(player, self.gender) }
+                        player_found = True
+                    i += 1
+
+                # Add Player
+                if(not player_found):
+                    player_scores.append({ "score": (score * bonus), "player": self.parent.parent.parent.get_player(player, self.gender) })
+
+            # End Round
+            if(t_round.get_id() == self.game.settings['round_count']):
+                i = 0
+                for p in player_scores:
+                    player_scores[i] = { "score": p['score'] * t_round.parent.get_difficulty(), "player": player_scores[i]['player'] }
+                    i += 1
+
+        # Title
+        print("Viewing Ranking Points for Season {0}, Tournament {1}, Round {2} of {3}s...".format(self.parent.parent.parent.get_id(), self.parent.parent.get_name(), self.parent.get_id(), self.get_gender()))
+        overall_place = 1
+        in_order = QuickSort(player_scores)
+        for p in reversed(in_order):
+            # Variables
+            player = p['player']
+            score = p['score']
+
+            # Print Data
+            print("#{0}: {1} — Score: {2:002.2f}".format(f"{overall_place:02}", player.get_name(), score))
             overall_place += 1
 
         input("\n>>> Press <Return> to continue...")
@@ -340,7 +387,7 @@ class MatchGender():
             c = 0
             print("Available Players to create for Round {}".format(self.parent.get_id()))
             for p in self.pop_player_list:
-                print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(self.pop_player_list)) else " "))
+                print("[{0}-{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(self.pop_player_list)) else " "))
                 c += 1
 
             # Has Errored
@@ -354,7 +401,7 @@ class MatchGender():
             player_names = resp.upper().replace(" ", "").split(",")
 
             # Pop Players Names from the list
-            if(len(player_names) == 2):
+            if(len(player_names) == 2 and (player_names[0] != player_names[1])):
                 if(player_names[0] in self.pop_player_list):
                     self.pop_player_list.remove(player_names[0])
                 else:
@@ -373,7 +420,7 @@ class MatchGender():
                 continue
 
             # Ask for Player Scores
-            print("\nPlease enter the scores for {} vs. {}: \"{}-0\":".format(player_names[0], player_names[1], self.game.settings["score_limit"][self.gender]))
+            print("\nPlease enter the scores for {} vs. {}: (Example: \"{}-0\")".format(player_names[0], player_names[1], self.game.settings["score_limit"][self.gender]))
             resp = input(">>> ")
             player_scores = resp.replace(" ", "").split("-")
 

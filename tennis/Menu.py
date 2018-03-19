@@ -60,9 +60,13 @@ class Menu():
                     for gdr in t_round.get_genders():
                         Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "{}{}".format(gdr[0].title(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if gdr[1].is_complete() else (Colours.FAIL + " (Incomplete)" + Colours.ENDC if gdr[1].is_available() else "")), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]))
 
-                        ## CHECK GENDER IS AVAILABLE
+                        ## CHECK GENDER IS AVAILABLE -----------------------------------------------------------------------------------------
                         if(gdr[1].is_available()):
                             Builder().add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]), partial(gdr[1].run))
+
+            ## STATISTCAL ANALYSIS -----------------------------------------------------------------------------------------------------------
+            Builder().add_menu("view_{}".format(season), "Statistical Analysis", "stats_{}".format(season))
+            Builder().add_func("view_{}".format(season), "stats_{}".format(season), partial(season_obj.statistical_analysis))
 
         # Show Menu
         Builder().show_current_menu()

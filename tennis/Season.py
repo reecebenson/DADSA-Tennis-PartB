@@ -6,6 +6,7 @@ import json
 from tennis.File import File
 from tennis.Player import Player
 from tennis import Tournament
+from tennis.Colours import Colours
 
 class Season():
     # Variables
@@ -76,6 +77,9 @@ class Season():
             for player in player_list[self.get_name()][gender]:
                 p = Player(player, gender, self)
                 self.players[gender].append(p)
+
+    def get_players(self, gender):
+        return self.players[gender] if gender in self.players else [ ]
     
     def get_player(self, name, gender):
         if(gender in self.players):
@@ -89,6 +93,117 @@ class Season():
         for gender in self.players:
             print("Gender: {}, count: {}".format(gender, len(self.players[gender])))
             print("{0}\n".format(", ".join([ player.get_name() for player in self.players[gender] ])))
+
+    def statistical_analysis(self, error=False, gender=None):
+        # Clear Screen
+        self.game.clear_screen()
+
+        # Has Errored
+        if(error and gender is None):
+            print("\n{0}{1}Error:{2}\n{0}You have entered an invalid value, please refer to the format.{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+            error = False
+
+        # Select a Gender
+        selected_gender = gender
+        if(selected_gender is None):
+            index = 0
+            print(Colours.BOLD + "Please select a gender:" + Colours.ENDC)
+            for gender in self.genders:
+                index += 1
+                print("{2}{0}{3}. {1}".format(index, gender.title(), Colours.OKGREEN, Colours.ENDC))
+            print("{0}b{1}. Back".format(Colours.FAIL, Colours.ENDC))
+
+            selected_gender = input(">>> ")
+        
+        if(type(selected_gender) is int or selected_gender.isdigit()):
+            if(int(selected_gender) > 0 and int(selected_gender) <= len(self.genders)):
+                # Update Variable
+                selected_gender = int(selected_gender)
+
+                # Clear Screen
+                self.game.clear_screen()
+
+                # Has Errored
+                if(error):
+                    print("\n{0}{1}Error:{2}\n{0}You have entered an invalid value, please refer to the format.{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+                    error = False
+
+                # Select a Statistical Type
+                print(Colours.BOLD + "Please select a statistic to view:" + Colours.ENDC)
+                print("{0}1{1}. Number of wins for a player with a particular score".format(Colours.OKGREEN, Colours.ENDC))
+                print("{0}2{1}. The percentage wins of a player".format(Colours.OKGREEN, Colours.ENDC))
+                print("{0}3{1}. Show the player(s) with the most wins".format(Colours.OKGREEN, Colours.ENDC))
+                print("{0}4{1}. Show the player(s) with the most losts".format(Colours.OKGREEN, Colours.ENDC))
+                print("{0}b{1}. Back".format(Colours.FAIL, Colours.ENDC))
+                
+                selected_stat = input(">>> ")
+                if(selected_stat.isdigit()):
+                    if(int(selected_stat) > 0 and int(selected_stat) <= 4):
+                        # Update Variable
+                        selected_stat = int(selected_stat)
+
+                        # Clear Screen
+                        self.game.clear_screen()
+
+                        # Select Tournament
+                        print(Colours.BOLD + "Please select a tournament:" + Colours.ENDC)
+                        i = 1
+                        for t in self.get_tournaments():
+                            print("{0}{1}{2}. {3}".format(Colours.OKGREEN, i, Colours.ENDC, t.get_name()))
+                            i += 1
+                        print("a. All")
+
+                        selected_tournament = input(">>> ")
+                        if(selected_tournament.isdigit() and (int(selected_tournament) > 0 and int(selected_tournament) <= i)):
+                            print("valid tournament")
+
+                            if(i == selected_tournament):
+                                print("all")
+                        else:
+                            return self.statistical_analysis(True, selected_gender)
+
+                        # Select Player
+                        if(selected_stat == 1 or selected_stat == 2):
+                            c = 0
+                            print(Colours.BOLD + "Please select a player:" + Colours.ENDC)
+                            for p in self.get_players(self.genders[selected_gender-1]):
+                                print("[{0}-{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(self.get_players(self.genders[selected_gender-1]))) else " "))
+                                c += 1
+
+                            selected_player = input(">>> ")
+                            temp_player_list = [ p.get_name() for p in self.get_players(self.genders[selected_gender-1]) ]
+                            if(selected_player.upper() in temp_player_list):
+                                plyr = self.get_player(selected_player.upper(), self.genders[selected_gender-1])
+
+                                print("Please enter the score to search for: (Example: \"{}-0\")".format(self.game.settings['score_limit'][self.genders[selected_gender-1]]))
+                            else:
+                                return self.statistical_analysis(True, selected_gender)
+                        elif(selected_stat == 3 or selected_stat == 4):
+                            pass
+
+                        input(">>> Press <Return> to continue...")
+                        return self.statistical_analysis(False, selected_gender)
+                    else:
+                        return self.statistical_analysis(True, selected_gender)
+                else:
+                    if(selected_stat.lower() == "b"):
+                        return self.statistical_analysis(False)
+                    else:
+                        return self.statistical_analysis(True, selected_gender)
+            else:
+                return self.statistical_analysis(True)
+        else:
+            if(selected_gender.lower() == "b"):
+                return "SKIP"
+            else:
+                return self.statistical_analysis(True)
+        """
+        A - Number of wins for a player with a particular score
+        B - The percentage wins of a player
+        C - Show the player with most wins in the season
+        D - Show the player with most loses in the season
+        """
+        pass
 
     def validate_season(self):
         # Validate Tournaments
