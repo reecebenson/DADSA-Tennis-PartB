@@ -125,7 +125,7 @@ class Season():
 
                 # Has Errored
                 if(error):
-                    print("\n{0}{1}Error:{2}\n{0}You have entered an invalid value, please refer to the format.{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+                    print("\n{0}{1}Error:{2}\n{0}You have entered an invalid option.{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
                     error = False
 
                 # Select a Statistical Type
@@ -151,40 +151,171 @@ class Season():
                         for t in self.get_tournaments():
                             print("{0}{1}{2}. {3}".format(Colours.OKGREEN, i, Colours.ENDC, t.get_name()))
                             i += 1
-                        print("a. All")
+                        print("{0}{1}{2}. {3}All{2}".format(Colours.OKGREEN, i, Colours.ENDC, Colours.BOLD))
 
                         selected_tournament = input(">>> ")
                         if(selected_tournament.isdigit() and (int(selected_tournament) > 0 and int(selected_tournament) <= i)):
-                            print("valid tournament")
-
-                            if(i == selected_tournament):
-                                print("all")
+                            # All Tournaments
+                            if(int(selected_tournament) == i):
+                                selected_tournament = "ALL"
+                            else:
+                                selected_tournament = self.get_tournaments()[int(selected_tournament)-1]
                         else:
                             return self.statistical_analysis(True, selected_gender)
+
+                        # Clear Screen
+                        self.game.clear_screen()
+
+                        # Title
+                        print(Colours.BOLD + "Selected Tournament: " + Colours.ENDC + Colours.OKBLUE + (selected_tournament.get_name() if type(selected_tournament) is not str else "All") + Colours.ENDC + "\n")
 
                         # Select Player
                         if(selected_stat == 1 or selected_stat == 2):
                             c = 0
-                            print(Colours.BOLD + "Please select a player:" + Colours.ENDC)
                             for p in self.get_players(self.genders[selected_gender-1]):
                                 print("[{0}-{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(self.get_players(self.genders[selected_gender-1]))) else " "))
                                 c += 1
 
+                            print(Colours.BOLD + "\nPlease select a player: (Example: \"MP01\")" + Colours.ENDC)
                             selected_player = input(">>> ")
                             temp_player_list = [ p.get_name() for p in self.get_players(self.genders[selected_gender-1]) ]
                             if(selected_player.upper() in temp_player_list):
                                 plyr = self.get_player(selected_player.upper(), self.genders[selected_gender-1])
 
-                                print("Please enter the score to search for: (Example: \"{}-0\")".format(self.game.settings['score_limit'][self.genders[selected_gender-1]]))
+                                # Number of wins for a player with a particular score
+                                if(selected_stat == 1):
+                                    not_finished = True
+                                    ss_error = False
+                                    while(True and not_finished):
+                                        # Error
+                                        if(ss_error):
+                                            print("\n{0}{1}Error:{2}\n{0}You have entered an invalid option.{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+                                            ss_error = False
+
+                                        print("\n{1}Please enter the score to search for: (Example: \"{0}-0\"){2}".format(self.game.settings['score_limit'][self.genders[selected_gender-1]], Colours.BOLD, Colours.ENDC))
+                                        score_search = input(">>> ")
+
+                                        # Analyse Input
+                                        scores = score_search.split("-")
+
+                                        # Error Checks
+                                        if(len(scores) != 2):
+                                            ss_error = True
+                                            continue
+                                        
+                                        if(not scores[0].isdigit() or not scores[1].isdigit()):
+                                            ss_error = True
+                                            continue
+                                        else:
+                                            scores[0] = int(scores[0])
+                                            scores[1] = int(scores[1])
+
+                                        if(scores[0] > self.game.settings['score_limit'][self.genders[selected_gender-1]] or scores[1] > self.game.settings['score_limit'][self.genders[selected_gender-1]]):
+                                            ss_error = True
+                                            continue
+
+                                        # Find Matches
+                                        print("\nFinding matches for {2}{0}{3} with the scores {2}{1}{3}{4}...".format(plyr.get_name(), score_search, Colours.OKBLUE, Colours.ENDC, " in tournament {1}{0}{2}".format(selected_tournament.get_name() if (type(selected_tournament) is not str) else "", Colours.OKBLUE, Colours.ENDC) if selected_tournament != "ALL" else ""))
+
+                                        # All Tournaments
+                                        if(type(selected_tournament) is str):
+                                            print()
+                                            for t in self.get_tournaments():
+                                                print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                                matches_found = False
+                                                for r in t.get_rounds():
+                                                    mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                                    if(not mg.is_complete()):
+                                                        print(Colours.GRAY + "\t(Round {0} is incomplete, so data has not been pulled from here)".format(r.get_id()) + Colours.ENDC)
+                                                    else:
+                                                        for m in mg.get_matches():
+                                                            plyr_one = m.get_player_one()
+                                                            plyr_two = m.get_player_two()
+
+                                                            if((plyr_one[0] == plyr.get_name() and plyr_one[1] == scores[0] and plyr_two[1] == scores[1]) or (plyr_two[0] == plyr.get_name() and plyr_one[1] == scores[1] and plyr_two[1] == scores[0])):
+                                                                print(Colours.GRAY + "\t(Round {0}) ".format(r.get_id()) + Colours.ENDC + m.get_match_text())
+                                                                matches_found = True
+                                                    
+                                                # No Matches Found
+                                                if(not matches_found):
+                                                    print(Colours.FAIL + "\tNo matches were found in this tournament." + Colours.ENDC)
+
+                                        # Specific Tournament
+                                        else:
+                                            print()
+                                            t = selected_tournament
+                                            print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                            matches_found = False
+                                            for r in t.get_rounds():
+                                                mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                                if(not mg.is_complete()):
+                                                    print(Colours.GRAY + "\t(Round {0} is incomplete, so data has not been pulled from here)".format(r.get_id()) + Colours.ENDC)
+                                                else:
+                                                    for m in mg.get_matches():
+                                                        plyr_one = m.get_player_one()
+                                                        plyr_two = m.get_player_two()
+
+                                                        if((plyr_one[0] == plyr.get_name() and plyr_one[1] == scores[0] and plyr_two[1] == scores[1]) or (plyr_two[0] == plyr.get_name() and plyr_one[1] == scores[1] and plyr_two[1] == scores[0])):
+                                                            print(Colours.GRAY + "\t(Round {0}) ".format(r.get_id()) + Colours.ENDC + m.get_match_text())
+                                                            matches_found = True
+                                                    
+                                            # No Matches Found
+                                            if(not matches_found):
+                                                print(Colours.FAIL + "\tNo matches were found in this tournament." + Colours.ENDC)
+                                        break
+                                elif(selected_stat == 2):
+                                    # All Tournaments
+                                    if(type(selected_tournament) is str):
+                                        print()
+                                        for t in self.get_tournaments():
+                                            round_wins = 0
+                                            print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                            for r in t.get_rounds():
+                                                mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                                if(not mg.is_complete()):
+                                                    print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                                else:
+                                                    print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+                                                    for m in mg.get_matches():
+                                                        if(m.get_winner() == plyr.get_name()):
+                                                            round_wins += 1
+                                                
+                                            print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
+
+                                    # Specific Tournament
+                                    else:
+                                        print()
+                                        t = selected_tournament
+                                        round_wins = 0
+                                        
+                                        print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                        for r in t.get_rounds():
+                                            mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                            if(not mg.is_complete()):
+                                                print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                            else:
+                                                print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+                                                for m in mg.get_matches():
+                                                    if(m.get_winner() == plyr.get_name()):
+                                                        round_wins += 1
+
+                                        print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
                             else:
                                 return self.statistical_analysis(True, selected_gender)
                         elif(selected_stat == 3 or selected_stat == 4):
                             pass
 
-                        input(">>> Press <Return> to continue...")
+                        input("\n>>> Press <Return> to continue...")
                         return self.statistical_analysis(False, selected_gender)
                     else:
-                        return self.statistical_analysis(True, selected_gender)
+                        if(selected_stat.lower() == "b"):
+                            return self.statistical_analysis(False)
+                        else:
+                            return self.statistical_analysis(True, selected_gender)
                 else:
                     if(selected_stat.lower() == "b"):
                         return self.statistical_analysis(False)
