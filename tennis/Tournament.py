@@ -12,6 +12,8 @@ class Tournament():
     json_data = None
     rounds = None
     gender = None
+    difficulty = None
+    prize_money = None
 
     def __init__(self, _game, _name, _parent, _json_data):
         self.name = _name
@@ -19,6 +21,8 @@ class Tournament():
         self.parent = _parent
         self.json_data = _json_data
         self.rounds = { }
+        self.difficulty = _json_data['_difficulty']
+        self.prize_money = _json_data['prize_money']
 
         # Read in Round Data
         for round_number in _json_data["rounds"]:
@@ -43,3 +47,9 @@ class Tournament():
 
     def get_round(self, round_id):
         return self.rounds["round_{0}".format(round_id)]
+
+    def get_difficulty(self):
+        return self.difficulty
+
+    def get_prize_money(self):
+        return self.prize_money

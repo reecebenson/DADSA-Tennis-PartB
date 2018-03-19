@@ -121,9 +121,12 @@ class MatchGender():
         # Setup List
         self.complete_scores = [ ]
 
+        # Get Differences for each set of ranking points
+        ranking_points = [ int(p) for p in reversed(list(self.game.settings['ranking_points'].keys())) ]
+        diffs = [ (next_p - p) for next_p, p in zip(ranking_points, [0] + ranking_points[:]) ]
+
         # Get Allocation Score
-        ##TODO: The difference between each one needs to be done here (as Lewis said) so that multipliers work, etc etc etc etc, i hate my life k
-        score_to_add = list(self.game.settings['ranking_points'].keys())[::-1][self.parent.get_id() - 1]
+        score_to_add = diffs[self.parent.get_id() - 1]
 
         # Get Previous Rounds Score
         previous_players = [ ]
@@ -131,7 +134,6 @@ class MatchGender():
             prev_round = self.parent.parent.get_round(self.parent.get_id() - 1).get_gender(self.gender)[1]
             if(len(prev_round.complete_scores) > 0):
                 previous_players = prev_round.complete_scores
-                print("previous round players retrieved")
 
         for match in self.get_matches():
             # Bonus
@@ -260,8 +262,12 @@ class MatchGender():
                 i = 0
                 for p in player_scores:
                     if(p['player'].get_name() == player):
-                        player_scores[i] = { "score": score if p['score'] < score else p['score'], "player": self.parent.parent.parent.get_player(player, self.gender) }
+                        player_scores[i] = { "score": p['score'] + score, "player": self.parent.parent.parent.get_player(player, self.gender) }
                         player_found = True
+
+                    # Is this the last round? If so, add tournament multiplier
+                    """if(t_round.get_id() == self.game.settings['round_count']):
+                        player_scores[i] = { "score": p['score'] * t_round.parent.get_difficulty(), "player": self.parent.parent.parent.get_player(player, self.gender) }"""
                     i += 1
 
                 # Add Player
@@ -269,6 +275,7 @@ class MatchGender():
                     player_scores.append({ "score": score, "player": self.parent.parent.parent.get_player(player, self.gender) })
 
         # Title
+        print(player_scores)
         print("Viewing Ranking Points for Season {0}, Tournament {1}, Round {2} of {3}s...".format(self.parent.parent.parent.get_id(), self.parent.parent.get_name(), self.parent.get_id(), self.get_gender()))
         overall_place = 1
         in_order = QuickSort(player_scores)
