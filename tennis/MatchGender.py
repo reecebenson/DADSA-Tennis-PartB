@@ -403,9 +403,11 @@ class MatchGender():
                     player_scores.append({ "score": (score * bonus), "player": self.parent.parent.parent.get_player(player, self.gender) })
 
             # End Round
+            ##TODO: Make it so if the player hasn't reached the same point as the last seasons same tournament, they don't get the bonus tournament difficulty
             if(t_round.get_id() == self.game.settings['round_count']):
                 i = 0
                 for p in player_scores:
+                    ##TODO: Here ^^^^
                     player_scores[i] = { "score": p['score'] * t_round.parent.get_difficulty(), "player": player_scores[i]['player'] }
                     i += 1
 
