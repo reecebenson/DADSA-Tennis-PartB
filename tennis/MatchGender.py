@@ -674,7 +674,6 @@ class MatchGender():
                                 c = 0
                                 print("Available Players to pair with {0}{1}{2}:".format(Colours.OKBLUE, player_name, Colours.ENDC))
                                 available_player_list = self.pop_player_list
-                                prev_season_round = self.game.get_season("season_{}".format(self.parent.parent.parent.get_id() - 1)).get_tournament(self.parent.parent.get_name()).get_round(self.parent.get_id() + 1).get_gender(self.gender)[1]
                                 crossed_out_players = [ ]
                                 for p in available_player_list:
                                     crossed_out = False
@@ -685,6 +684,7 @@ class MatchGender():
 
                                     # Opposing Player of Last Season, Same Tournament, Next Round
                                     if(self.parent.get_id() < self.game.settings['round_count']):
+                                        prev_season_round = self.game.get_season("season_{}".format(self.parent.parent.parent.get_id() - 1)).get_tournament(self.parent.parent.get_name()).get_round(self.parent.get_id() + 1).get_gender(self.gender)[1]
                                         for m in prev_season_round.get_matches():
                                             if((m.player_one == player_name and m.player_two == p) or (m.player_one == p and m.player_two == player_name)):
                                                 crossed_out = True
