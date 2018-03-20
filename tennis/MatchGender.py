@@ -63,7 +63,13 @@ class MatchGender():
             if(not mg.is_complete()):
                 all_complete = False
                 break
-        
+
+        # Increase the wins of each winning player
+        for m in self.get_matches():
+            for p in self.parent.parent.parent.get_players(self.gender):
+                if(m.get_winner() == p.get_name()):
+                    p.increment_wins()
+
         # Are all the rounds complete?
         if(all_complete):
             print("Everything is complete!")

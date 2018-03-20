@@ -3,6 +3,7 @@
  # Created by Reece Benson (16021424)
 """
 import json
+import cProfile
 from tennis.File import File
 from tennis.Player import Player
 from tennis import Tournament
@@ -307,7 +308,75 @@ class Season():
                             else:
                                 return self.statistical_analysis(True, selected_gender)
                         elif(selected_stat == 3 or selected_stat == 4):
-                            pass
+                            # Wins
+                            if(selected_stat == 3):
+                                # All Tournaments
+                                if(type(selected_tournament) is str):
+                                    print()
+                                    for p in self.get_players(self.genders[selected_gender-1]):
+                                        print(p.get_name(), p.get_wins())
+                                        ##TODO
+
+                                # Specific Tournament
+                                else:
+                                    print()
+                                    t = selected_tournament
+                                    round_wins = 0
+                                    
+                                    print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                    for r in t.get_rounds():
+                                        mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                        if(not mg.is_complete()):
+                                            print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                        else:
+                                            print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+                                            for m in mg.get_matches():
+                                                if(m.get_winner() == plyr.get_name()):
+                                                    round_wins += 1
+
+                                    print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
+                            
+                            # Losses
+                            elif(selected_stat == 4):
+                                # All Tournaments
+                                if(type(selected_tournament) is str):
+                                    print()
+                                    for t in self.get_tournaments():
+                                        round_wins = 0
+                                        print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                        for r in t.get_rounds():
+                                            mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                            if(not mg.is_complete()):
+                                                print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                            else:
+                                                print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+                                                for m in mg.get_matches():
+                                                    if(m.get_winner() == plyr.get_name()):
+                                                        round_wins += 1
+                                            
+                                        print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
+
+                                # Specific Tournament
+                                else:
+                                    print()
+                                    t = selected_tournament
+                                    round_wins = 0
+                                    
+                                    print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                    for r in t.get_rounds():
+                                        mg = r.get_gender(self.genders[selected_gender-1])[1]
+
+                                        if(not mg.is_complete()):
+                                            print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                        else:
+                                            print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+                                            for m in mg.get_matches():
+                                                if(m.get_winner() == plyr.get_name()):
+                                                    round_wins += 1
+
+                                    print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
 
                         input("\n>>> Press <Return> to continue...")
                         return self.statistical_analysis(False, selected_gender)

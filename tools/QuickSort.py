@@ -2,7 +2,6 @@
  # Data Structures and Algorithms - Part B
  # Created by Reece Benson (16021424)
 """
-# Pure implementation of quick sort algorithm in Python
 def quick_sort_score(arr):
     if(len(arr) <= 1): return arr
     else:
