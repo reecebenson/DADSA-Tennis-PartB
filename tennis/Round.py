@@ -37,9 +37,10 @@ class Round():
             self.genders.update({ gender: match_gender })
 
             # Read in Round
-            for match in gender_data:
-                # Add our Match to the Round Gender
-                match_gender.add_match(match)
+            if(self.parent.parent.get_id() == 1):
+                for match in gender_data:
+                    # Add our Match to the Round Gender
+                    match_gender.add_match(match)
 
         if(_game.debug):
             print("[ROUND]: Round '{}' made!".format(self.id))

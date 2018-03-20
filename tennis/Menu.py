@@ -47,22 +47,24 @@ class Menu():
             if(menu_debug):
                 Builder().add_menu("debug", "List Season {} Players".format(season_id), "debug_list_players_s{}".format(season_id))
                 Builder().add_func("debug", "debug_list_players_s{}".format(season_id), partial(season_obj.list_players))
+                Builder().add_menu("debug", "List Seasons".format(season_id), "debug_list_seasons_{}".format(season_id))
+                Builder().add_func("debug", "debug_list_seasons_{}".format(season_id), partial(self.game.list_seasons))
 
             ## TOURNAMENTS -------------------------------------------------------------------------------------------------------------------
             for tournament in self.game.seasons[season].get_tournaments():
-                Builder().add_menu("view_{}".format(season), "{}{}".format(tournament.get_name(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if tournament.is_complete() else Colours.FAIL + " (Incomplete)" + Colours.ENDC), "t{}".format(tournament.get_name()))
+                Builder().add_menu("view_{}".format(season), "{}{}".format(tournament.get_name(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if tournament.is_complete() else Colours.FAIL + " (Incomplete)" + Colours.ENDC), "s{}_t{}".format(season_obj.get_id(), tournament.get_name()))
 
                 ## ROUNDS --------------------------------------------------------------------------------------------------------------------
                 for t_round in tournament.get_rounds():
-                    Builder().add_menu("t{}".format(tournament.get_name()), "Round {}".format(t_round.get_id()), "t{}_r{}".format(tournament.get_name(), t_round.get_id()))
+                    Builder().add_menu("s{}_t{}".format(season_obj.get_id(), tournament.get_name()), "Round {}".format(t_round.get_id()), "s_{}_t{}_r{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id()))
 
                     ## GENDERS ---------------------------------------------------------------------------------------------------------------
                     for gdr in t_round.get_genders():
-                        Builder().add_menu("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "{}{}".format(gdr[0].title(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if gdr[1].is_complete() else (Colours.FAIL + " (Incomplete)" + Colours.ENDC if gdr[1].is_available() else "")), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]))
+                        Builder().add_menu("s_{}_t{}_r{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id()), "{}{}".format(gdr[0].title(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if gdr[1].is_complete() else (Colours.FAIL + " (Incomplete)" + Colours.ENDC if gdr[1].is_available() else "")), "s_{}_t{}_r{}_g{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id(), gdr[0]))
 
                         ## CHECK GENDER IS AVAILABLE -----------------------------------------------------------------------------------------
                         if(gdr[1].is_available()):
-                            Builder().add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]), partial(gdr[1].run))
+                            Builder().add_func("s_{}_t{}_r{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id()), "s_{}_t{}_r{}_g{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id(), gdr[0]), partial(gdr[1].run))
 
             ## DEBUG -------------------------------------------------------------------------------------------------------------------------
             if(self.game.debug):

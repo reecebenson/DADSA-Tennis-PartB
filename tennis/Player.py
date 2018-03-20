@@ -11,6 +11,7 @@ class Player():
     lost_count = None
     total_win_count = None
     total_lost_count = None
+    in_first_16 = None
 
     def __init__(self, _name, _gender, _season):
         self.name = _name
@@ -20,6 +21,8 @@ class Player():
         self.lost_count = { }
         self.total_win_count = 0
         self.total_lost_count = 0
+        self.score = { }
+        self.in_first_16 = False
 
     def get_name(self):
         return self.name
@@ -29,6 +32,19 @@ class Player():
 
     def get_season(self):
         return self.season
+
+    def set_score(self, tournament_name, score):
+        if(tournament_name in self.score):
+            self.score[tournament_name] = score
+        else:
+            self.score.update({ tournament_name: score })
+
+    def get_score(self, tournament_name):
+        if(tournament_name in self.score):
+            return self.score[tournament_name]
+        else:
+            self.set_score(tournament_name, 0)
+            return self.get_score(tournament_name)
 
     def get_wins(self, tournament_name):
         if(tournament_name in self.win_count):

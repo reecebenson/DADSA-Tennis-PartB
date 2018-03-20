@@ -84,6 +84,7 @@ class Season():
                 p = Player(player, gender, self)
                 self.players[gender].append(p)
 
+
     def get_players(self, gender):
         return self.players[gender] if gender in self.players else [ ]
     
@@ -99,6 +100,7 @@ class Season():
         for gender in self.players:
             print("Gender: {}, count: {}".format(gender, len(self.players[gender])))
             print("{0}\n".format(", ".join([ player.get_name() for player in self.players[gender] ])))
+            print("{0}\n".format([ player for player in self.players[gender] ]))
 
     def statistical_analysis(self, error=False, gender=None):
         # Clear Screen
@@ -525,7 +527,7 @@ class Season():
                         m.validate_match(self.game.settings['score_limit'][g[1].get_gender()], r.get_id())
 
             # Save Data
-            self.save()
+            # self.save()
 
     def save(self):
         # Grab all data

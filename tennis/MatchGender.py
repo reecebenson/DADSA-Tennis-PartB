@@ -83,6 +83,49 @@ class MatchGender():
                 self.complete_winners.append(m.player_two)
                 self.complete_losers.append(m.player_one)
 
+        # Add Ranking Points to Player Object
+        player_scores = [ ]
+        for t_round in self.parent.parent.get_rounds():
+            # Get Round Data
+            mg = t_round.get_gender(self.gender)[1]
+
+            # Break if Round is incomplete
+            if(not mg.is_complete()):
+                break
+
+            # Set the scores
+            for player_score in mg.complete_scores:
+                player = player_score[0]
+                score = float(player_score[1])
+                bonus = float(player_score[2])
+
+                # Find Player
+                player_found = False
+                i = 0
+                for p in player_scores:
+                    if(p['player'].get_name() == player):
+                        player_scores[i] = { "score": p['score'] + (score * bonus), "player": self.parent.parent.parent.get_player(player, self.gender) }
+                        player_found = True
+                    i += 1
+
+                # Add Player
+                if(not player_found):
+                    player_scores.append({ "score": (score * bonus), "player": self.parent.parent.parent.get_player(player, self.gender) })
+
+            # End Round
+            if(t_round.get_id() == self.game.settings['round_count']):
+                i = 0
+                for p in player_scores:
+                    player_scores[i] = { "score": p['score'] * t_round.parent.get_difficulty(), "player": player_scores[i]['player'] }
+                    i += 1
+
+        # Cycle through Player Objects and set their score for this tournament
+        for p in player_scores:
+            plyr = p['player']
+            score = p['score']
+
+            plyr.set_score(self.parent.parent.get_name(), score)
+        
         # Are all the rounds complete?
         if(all_complete):
             # Mark Tournmanent as complete if both genders are valid
@@ -179,6 +222,7 @@ class MatchGender():
             match_add_score = int(score_to_add)
 
             print("Winner: {}, score to set: {} ({})".format(match.get_winner(), match_add_score, "No Bonus" if bonus == 1 else "Bonus"))
+            # TODO make it run, make it right, make it wrong, make it the best you can.
             self.complete_scores.append((match.get_player_one()[0], match_add_score if match.get_winner() == match.get_player_one()[0] else 0, bonus))
             self.complete_scores.append((match.get_player_two()[0], match_add_score if match.get_winner() == match.get_player_two()[0] else 0, bonus))
         pass
@@ -192,7 +236,7 @@ class MatchGender():
             print("\n" + Colours.BOLD + "Error:" + Colours.ENDC + "\n" + Colours.FAIL + "You have entered an invalid option.\n" + Colours.ENDC)
 
         # Menu Options
-        print(Colours.BOLD + "Please select an option:" + Colours.ENDC + " (Viewing: " + "{3}{0}, Round {1}, {2}{4}".format(self.parent.parent.get_name(), str(self.parent.get_id()), self.get_gender().title(), Colours.GRAY, Colours.ENDC) + ")")
+        print(Colours.BOLD + "Please select an option:" + Colours.ENDC + " (Viewing: {3}Season {5}, {0}, Round {1}, {2}{4}".format(self.parent.parent.get_name(), str(self.parent.get_id()), self.get_gender().title(), Colours.GRAY, Colours.ENDC, self.parent.parent.parent.get_id()) + ")")
         print(Colours.OKGREEN + "1" + Colours.ENDC + ". View Round{}".format("" if self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
         print(Colours.OKGREEN + "2" + Colours.ENDC + ". View Prize Money{}".format("" if self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
         print(Colours.OKGREEN + "3" + Colours.ENDC + ". View Ranking Points{}".format("" if self.is_complete() else Colours.FAIL + " (Not Available)" + Colours.ENDC))
@@ -328,9 +372,10 @@ class MatchGender():
         for t_round in self.parent.parent.get_rounds():
             # Get Round Data
             mg = t_round.get_gender(self.gender)[1]
+            mg.finalise()
 
             # Break if Round is incomplete
-            if(not mg.is_complete()):
+            if(not mg.is_complete() or self.parent.get_id() < t_round.get_id()):
                 break
 
             # Set the scores
@@ -338,6 +383,8 @@ class MatchGender():
                 player = player_score[0]
                 score = float(player_score[1])
                 bonus = float(player_score[2])
+
+                print("applying bonus of {} to {}".format(bonus, player))
 
                 # Find Player
                 player_found = False
@@ -397,12 +444,71 @@ class MatchGender():
 
     def input_manual(self):
         # Players
-        if(self.pop_player_list is None):
-            self.pop_player_list = self.get_players()
-            self.inputted_matches = [ ]
+        self.pop_player_list = self.get_players()
+
+        # First Round
+        if(len(self.pop_player_list) == 0 and self.parent.get_id() == 1):
+            self.pop_player_list = [ p.get_name() for p in self.parent.parent.parent.get_players(self.gender) ]
+            print("set list to all players")
+            input("...")
+        elif(len(self.pop_player_list) == 0 and self.parent.get_id() > 1):
+            self.pop_player_list = self.parent.parent.get_round(self.parent.get_id() - 1).get_gender(self.gender)[1].get_winners()
+            print("set list to parent players")
+            input("...")
+        else:
+            print("Something is majorly fucked!")
+            input("...")
+
+        self.inputted_matches = [ ]
 
         # Disable File Input
         self.set_input_file_state(False)
+
+        past_tournament = None
+        past_round_data = None
+        top_half_players = None
+        bottom_half_players = None
+        player_scores = None
+
+        # Check if Season ID is not 1
+        if(self.parent.parent.parent.get_id() > 1):
+            # Get the past tournament
+            past_season = self.game.get_season("season_{}".format(self.parent.parent.parent.get_id() - 1))
+            past_tournament = past_season.get_tournament(self.parent.parent.get_name())
+            past_round_data = past_tournament.get_round(self.parent.get_id()).get_gender(self.gender)[1]
+
+            # Top 16 and Bottom 16
+            top_half_players = [ ]
+            bottom_half_players = [ ]
+
+            # Temporary Player Scores
+            player_scores = [ ]
+
+            # Go through each completed round
+            for t in past_season.get_tournaments():
+                for p in past_season.get_players(self.gender):
+                    player_found = None
+                    i = 0
+                    for ps in player_scores:
+                        if(ps['player'].get_name() == p.get_name()):
+                            player_found = True
+                            player_scores[i] = { "score": player_scores[i]['score'] + p.get_score(t.get_name()), "player": player_scores[i]['player'] }
+                        i += 1
+
+                    if(not player_found):
+                        player_scores.append({ "score": p.get_score(t.get_name()), "player": p })
+
+            # Set Players
+            overall_place = 1
+            in_order = QuickSort(player_scores)
+            for p in reversed(in_order):
+                # Set Players
+                if(overall_place <= (int(len(player_scores) / 2))):
+                    top_half_players.append(p['player'].get_name())
+                else:
+                    bottom_half_players.append(p['player'].get_name())
+
+                overall_place += 1
 
         # Print Instructions
         error = False
@@ -462,44 +568,180 @@ class MatchGender():
                 player_names = []
                 player_popper_error = False
                 while(True):
+                    # Clear Screen
+                    self.game.clear_screen()
+
+                    # Print Previous Matches
+                    if(len(self.inputted_matches) > 0):
+                        print("Current matches created:")
+                        for m in self.inputted_matches:
+                            print("[{0}] {1} - {2} [{3}]".format(m['player_one'], m['player_one_score'], m['player_two_score'], m['player_two']))
+                        print()
+                        
+                    # Print Player List
+                    c = 0
+                    print("Available Players to create for Round {}".format(self.parent.get_id()))
+                    for p in self.pop_player_list:
+                        print("[{0}-{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(self.pop_player_list)) else " "))
+                        c += 1
+
                     # Error Check
                     if(player_popper_error):
                         print("\n{0}{1}Error:{2}\n{0}You have entered an invalid player name, refer to the example format.{2}".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
                         player_popper_error = False
 
                     print("\nPlease enter a player name: (Example: \"MP01\")")
-                    resp = input(">>> ")
+                    resp = input(">>> ") or self.pop_player_list[0]
                     player_name = resp.upper()
 
                     # Check if player is in list
                     if(player_name in self.pop_player_list):
-                        # Player Found
-                        player_names.append(player_name)
-
                         # Show available pairing players
                         available_players = [ ]
-                        past_round_data = self.game.get_season("season_{}".format(self.parent.parent.parent.get_id() - 1)).get_tournament(self.parent.parent.get_name()).get_round(self.parent.get_id()).get_gender(self.gender)[1]
 
                         # Round One can only be paired for Winners vs. Losers
                         if(self.parent.get_id() == 1):
-                            print("winners:", past_round_data.get_winners())
-                            print("losers:", past_round_data.get_losers())
+                            # Print Player List
+                            pair_player_error = False
+                            while(True):
+                                # Clear Screen
+                                self.game.clear_screen()
 
-                            top_16_players = None
-                            bottom_16_players = None
+                                # Error Check
+                                if(pair_player_error):
+                                    print("\n{0}{1}Error:{2}\n{0}You have entered an invalid player name, refer to the example format. CD{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+                                    pair_player_error = False
 
-                            ##TODO:
-                            # - Copy how prize money is done to grab the top "top_16_players" of the tournament
-                            # - And then the bottom 16 is classed in "bottom_16_players"
-                            # - Use of QuickSort algorithm again
+                                c = 0
+                                print("Available Players to pair with {0}{1}{2}:".format(Colours.OKBLUE, player_name, Colours.ENDC))
+                                available_player_list = top_half_players if player_name in bottom_half_players else bottom_half_players
+                                for p in available_player_list:
+                                    print("[{0}-{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD, p), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(available_player_list)) else " "))
+                                    c += 1
+                                    
+                                print("Please enter the paired player name: (Example: \"MP01\")")
+                                paired_player = input(">>> ").upper() or available_player_list[0]
+
+                                # Check if entered player is in the list
+                                if(paired_player in available_player_list):
+                                    # Player Found
+                                    if(player_name in self.pop_player_list):
+                                        player_names.append(player_name)
+                                        self.pop_player_list.remove(player_name)
+
+                                        # Pop player from half players
+                                        if(player_name in top_half_players):
+                                            top_half_players.remove(player_name)
+                                        else:
+                                            bottom_half_players.remove(player_name)
+                                    else:
+                                        self.pop_player_list = cached_player_list
+                                        player_popper_error = True
+                                        continue
+
+                                    # Paired Player
+                                    if(paired_player in self.pop_player_list):
+                                        player_names.append(paired_player)
+                                        self.pop_player_list.remove(paired_player)
+
+                                        # Pop player from half players
+                                        if(paired_player in top_half_players):
+                                            top_half_players.remove(paired_player)
+                                        else:
+                                            bottom_half_players.remove(paired_player)
+                                    else:
+                                        self.pop_player_list = cached_player_list
+                                        pair_player_error = True
+                                        continue
+                                    break
+                                else:
+                                    pair_player_error = True
+                                    continue
+                            
+                        # Round 2 - End
+                        else:
+                            # Print Player List
+                            pair_player_error = False
+                            while(True):
+                                # Clear Screen
+                                self.game.clear_screen()
+
+                                # Error Check
+                                if(pair_player_error):
+                                    print("\n{0}{1}Error:{2}\n{0}You have entered an invalid player name, refer to the example format. DX{2}\n".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+                                    pair_player_error = False
+
+                                c = 0
+                                print("Available Players to pair with {0}{1}{2}:".format(Colours.OKBLUE, player_name, Colours.ENDC))
+                                available_player_list = self.pop_player_list
+                                prev_season_round = self.game.get_season("season_{}".format(self.parent.parent.parent.get_id() - 1)).get_tournament(self.parent.parent.get_name()).get_round(self.parent.get_id() + 1).get_gender(self.gender)[1]
+                                crossed_out_players = [ ]
+                                for p in available_player_list:
+                                    crossed_out = False
+
+                                    # Same Player
+                                    if(p == player_name):
+                                        crossed_out = True
+
+                                    # Opposing Player of Last Season, Same Tournament, Next Round
+                                    if(self.parent.get_id() < self.game.settings['round_count']):
+                                        for m in prev_season_round.get_matches():
+                                            if((m.player_one == player_name and m.player_two == p) or (m.player_one == p and m.player_two == player_name)):
+                                                crossed_out = True
+                                                crossed_out_players = p
+                                    
+                                    print("[{0}-{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{c:02}", Colours.ENDC, Colours.BOLD if not crossed_out else Colours.FAIL, p), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(available_player_list)) else " "))
+                                    c += 1
+                                    
+                                print("Please enter the paired player name: (Example: \"MP01\")")
+                                paired_player = input(">>> ").upper()
+
+                                # Check if entered player is in the list
+                                if(paired_player in available_player_list and paired_player not in crossed_out_players):
+                                    # Player Found
+                                    if(player_name in self.pop_player_list):
+                                        player_names.append(player_name)
+                                        self.pop_player_list.remove(player_name)
+
+                                        # Pop player from half players
+                                        if(player_name in top_half_players):
+                                            top_half_players.remove(player_name)
+                                        else:
+                                            bottom_half_players.remove(player_name)
+                                    else:
+                                        self.pop_player_list = cached_player_list
+                                        player_popper_error = True
+                                        continue
+
+                                    # Paired Player
+                                    if(paired_player in self.pop_player_list):
+                                        player_names.append(paired_player)
+                                        self.pop_player_list.remove(paired_player)
+
+                                        # Pop player from half players
+                                        if(paired_player in top_half_players):
+                                            top_half_players.remove(paired_player)
+                                        else:
+                                            bottom_half_players.remove(paired_player)
+                                    else:
+                                        self.pop_player_list = cached_player_list
+                                        pair_player_error = True
+                                        continue
+                                    break
+                                else:
+                                    pair_player_error = True
+                                    continue
                     else:
                         player_popper_error = True
                         continue
 
+                    # Finish Loop
+                    break
+
 
             # Ask for Player Scores
             print("\nPlease enter the scores for {} vs. {}: (Example: \"{}-0\")".format(player_names[0], player_names[1], self.game.settings["score_limit"][self.gender]))
-            resp = input(">>> ")
+            resp = input(">>> ") or "3-0"
             player_scores = resp.replace(" ", "").split("-")
 
             # Validate Scores as Integers/Digits
@@ -525,7 +767,9 @@ class MatchGender():
             self.inputted_matches.append({ 'player_one': player_names[0], 'player_two': player_names[1], 'player_one_score': player_one_score, 'player_two_score': player_two_score })
             input("\nMatch Created: [{}] {} - {} [{}], press <Return> to continue...".format(player_names[0], player_scores[0], player_scores[1], player_names[1]))
 
-        if((len(self.pop_player_list) == 0) and (len(self.inputted_matches) == len(self.get_players()) / 2)):
+        if(len(self.pop_player_list) == 0):
+            print("complete")
+
             # Set Flags
             self.set_complete(True)
             self.set_next_round_as_available()
