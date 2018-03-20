@@ -21,6 +21,8 @@ class MatchGender():
     pop_player_list = None
 
     # End of Round Variables
+    complete_winners = None
+    complete_losers = None
     complete_scores = None
 
     def __init__(self, _game, _gender, _parent):
@@ -38,6 +40,8 @@ class MatchGender():
 
         # End of Round Variables
         self.complete_scores = [ ]
+        self.complete_winners = [ ]
+        self.complete_losers = [ ]
 
     def add_match(self, match):
         m = Match.Match(self.game, self.gender, self, match)
@@ -69,9 +73,15 @@ class MatchGender():
             if(m.get_winner() == m.player_one):
                 m.player_one_object.increment_wins(self.parent.parent.get_name())
                 m.player_two_object.increment_losts(self.parent.parent.get_name())
+
+                self.complete_winners.append(m.player_one)
+                self.complete_losers.append(m.player_two)
             elif(m.get_winner() == m.player_two):
                 m.player_two_object.increment_wins(self.parent.parent.get_name())
                 m.player_one_object.increment_losts(self.parent.parent.get_name())
+
+                self.complete_winners.append(m.player_two)
+                self.complete_losers.append(m.player_one)
 
         # Are all the rounds complete?
         if(all_complete):
@@ -105,6 +115,12 @@ class MatchGender():
 
     def get_matches(self):
         return [ m for m in self.matches ]
+
+    def get_losers(self):
+        return self.complete_losers
+
+    def get_winners(self):
+        return self.complete_winners
 
     def get_players(self):
         players = [ ]
@@ -417,28 +433,69 @@ class MatchGender():
                 error = False
 
             # Ask for Player Names
-            print("\nPlease enter 2 player names in the following format: \"MP01,MP15\":")
-            resp = input(">>> ")
-            player_names = resp.upper().replace(" ", "").split(",")
+            if(self.parent.parent.parent.get_id() == 1):
+                print("\nPlease enter 2 player names in the following format: (Example: \"MP01,MP15\")")
+                resp = input(">>> ")
+                player_names = resp.upper().replace(" ", "").split(",")
 
-            # Pop Players Names from the list
-            if(len(player_names) == 2 and (player_names[0] != player_names[1])):
-                if(player_names[0] in self.pop_player_list):
-                    self.pop_player_list.remove(player_names[0])
+                # Pop Players Names from the list
+                if(len(player_names) == 2 and (player_names[0] != player_names[1])):
+                    if(player_names[0] in self.pop_player_list):
+                        self.pop_player_list.remove(player_names[0])
+                    else:
+                        self.pop_player_list = cached_player_list
+                        error = True
+                        continue
+
+                    if(player_names[1] in self.pop_player_list):
+                        self.pop_player_list.remove(player_names[1])
+                    else:
+                        self.pop_player_list = cached_player_list
+                        error = True
+                        continue
                 else:
-                    self.pop_player_list = cached_player_list
                     error = True
                     continue
-
-                if(player_names[1] in self.pop_player_list):
-                    self.pop_player_list.remove(player_names[1])
-                else:
-                    self.pop_player_list = cached_player_list
-                    error = True
-                    continue
+            
+            # New Season (not the default one)
             else:
-                error = True
-                continue
+                player_names = []
+                player_popper_error = False
+                while(True):
+                    # Error Check
+                    if(player_popper_error):
+                        print("\n{0}{1}Error:{2}\n{0}You have entered an invalid player name, refer to the example format.{2}".format(Colours.FAIL, Colours.BOLD, Colours.ENDC))
+                        player_popper_error = False
+
+                    print("\nPlease enter a player name: (Example: \"MP01\")")
+                    resp = input(">>> ")
+                    player_name = resp.upper()
+
+                    # Check if player is in list
+                    if(player_name in self.pop_player_list):
+                        # Player Found
+                        player_names.append(player_name)
+
+                        # Show available pairing players
+                        available_players = [ ]
+                        past_round_data = self.game.get_season("season_{}".format(self.parent.parent.parent.get_id() - 1)).get_tournament(self.parent.parent.get_name()).get_round(self.parent.get_id()).get_gender(self.gender)[1]
+
+                        # Round One can only be paired for Winners vs. Losers
+                        if(self.parent.get_id() == 1):
+                            print("winners:", past_round_data.get_winners())
+                            print("losers:", past_round_data.get_losers())
+
+                            top_16_players = None
+                            bottom_16_players = None
+
+                            ##TODO:
+                            # - Copy how prize money is done to grab the top "top_16_players" of the tournament
+                            # - And then the bottom 16 is classed in "bottom_16_players"
+                            # - Use of QuickSort algorithm again
+                    else:
+                        player_popper_error = True
+                        continue
+
 
             # Ask for Player Scores
             print("\nPlease enter the scores for {} vs. {}: (Example: \"{}-0\")".format(player_names[0], player_names[1], self.game.settings["score_limit"][self.gender]))
