@@ -206,7 +206,10 @@ class MatchGender():
         diffs = [ (next_p - p) for next_p, p in zip(ranking_points, [0] + ranking_points[:]) ]
 
         # Get Allocation Score
-        score_to_add = diffs[self.parent.get_id() - 1]
+        if(self.parent.get_id() == self.game.settings['round_count']):
+            score_to_add = ranking_points[self.parent.get_id() - 2]
+        else:
+            score_to_add = ranking_points[self.parent.get_id() - 1]
 
         # Get Previous Rounds Score
         previous_players = [ ]
@@ -223,8 +226,8 @@ class MatchGender():
 
             print("Winner: {}, score to set: {} ({})".format(match.get_winner(), match_add_score, "No Bonus" if bonus == 1 else "Bonus"))
             # TODO make it run, make it right, make it wrong, make it the best you can.
-            self.complete_scores.append((match.get_player_one()[0], match_add_score if match.get_winner() == match.get_player_one()[0] else 0, bonus))
-            self.complete_scores.append((match.get_player_two()[0], match_add_score if match.get_winner() == match.get_player_two()[0] else 0, bonus))
+            self.complete_scores.append((match.get_player_one()[0], match_add_score if match.get_winner() == match.get_player_one()[0] else 0, 1 if self.parent.get_id() >= (self.game.settings['round_count']-1) else bonus))
+            self.complete_scores.append((match.get_player_two()[0], match_add_score if match.get_winner() == match.get_player_two()[0] else 0, 1 if self.parent.get_id() >= (self.game.settings['round_count']-1) else bonus))
         pass
 
     def run(self, error=False):
