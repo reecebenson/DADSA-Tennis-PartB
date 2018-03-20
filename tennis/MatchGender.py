@@ -34,7 +34,7 @@ class MatchGender():
         self.pop_player_list = None
         self.available = False
         self.complete = False
-        self.input_file_state = True
+        self.input_file_state = True if self.parent.parent.parent.get_id() == 1 else False
 
         # End of Round Variables
         self.complete_scores = [ ]
@@ -75,7 +75,19 @@ class MatchGender():
 
         # Are all the rounds complete?
         if(all_complete):
-            print("Everything is complete!")
+            # Mark Tournmanent as complete if both genders are valid
+            for gender in self.parent.genders:
+                completely_complete = True
+                for t_round in self.parent.parent.get_rounds():
+                    mg = t_round.get_gender(gender)[1]
+                    if(not mg.is_complete()):
+                        completely_complete = False
+                        break
+            
+            # ALL
+            if(completely_complete):
+                self.parent.parent.set_complete(True)
+                Builder().reload_menu()
         else:
             print("Not everything is complete.")
 

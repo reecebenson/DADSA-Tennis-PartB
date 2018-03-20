@@ -14,6 +14,7 @@ class Tournament():
     gender = None
     difficulty = None
     prize_money = None
+    complete = None
 
     def __init__(self, _game, _name, _parent, _json_data):
         self.name = _name
@@ -23,6 +24,7 @@ class Tournament():
         self.rounds = { }
         self.difficulty = _json_data['_difficulty']
         self.prize_money = _json_data['prize_money']
+        self.complete = False
 
         # Read in Round Data
         for round_number in _json_data["rounds"]:
@@ -53,3 +55,24 @@ class Tournament():
 
     def get_prize_money(self):
         return self.prize_money
+
+    def is_complete(self):
+        return self.complete
+
+    def set_complete(self, state):
+        # Set this tournament as complete
+        self.complete = state
+
+        # Check if other tournaments are complete
+        all_complete = True
+        for t in self.parent.get_tournaments():
+            if(not t.is_complete()):
+                all_complete = False
+
+        if(all_complete):
+            # Open up the next season
+            print("All tournaments are now complete! Start opening season {}".format(self.parent.get_id() + 1))
+            input(">>> Press <Return> to continue...")
+
+            # Create New Season
+            self.game.add_season(self.parent.get_id() + 1)

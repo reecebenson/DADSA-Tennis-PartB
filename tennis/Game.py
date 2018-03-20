@@ -73,6 +73,24 @@ class Game():
             with open(sessionPath, 'rb') as session_file:
                 self.seasons = pickle.load(session_file)
     
+    def add_season(self, season_id):
+        # Get Season ID
+        last_season = self.get_season("season_{}".format(season_id-1))
+        if(last_season is None):
+            print("Failed to create Season {}, a previous season does not exist.".format(season_id))
+            self.exit()
+            return
+
+        # Populate Season
+        new_season = Season.Season(self.game, "season_{}".format(season_id), last_season.json_data, last_season.json_data['players'])
+        new_season.set_availability(True)
+
+        # Add Season
+        self.seasons.update({ "season_{}".format(season_id): new_season })
+
+        # Reload Menu
+        Builder().reload_menu()
+
     def get_season(self, season_name):
         return self.seasons[season_name] if season_name in self.seasons else None
 

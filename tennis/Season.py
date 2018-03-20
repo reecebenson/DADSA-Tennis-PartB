@@ -24,6 +24,7 @@ class Season():
         self.id = int(_name[-1:])
         self.game = _game
         self.json_data = _json_data
+        self.json_data['players'] = _players
         self.tournaments = { }
         self.players = { }
         self.genders = [ ]
@@ -64,8 +65,12 @@ class Season():
     def set_availability(self, state):
         self.available = state
 
+    def force_complete(self):
+        for t in self.get_tournaments():
+            t.set_complete(True)
+
     def set_players(self, player_list):
-        for gender in player_list[self.get_name()]:
+        for gender in player_list:
             # Add Gender to Genders List
             if(gender not in self.genders):
                 self.genders.append(gender)
@@ -75,7 +80,7 @@ class Season():
                 self.players.update({ gender: [ ] })
 
             # Create Player
-            for player in player_list[self.get_name()][gender]:
+            for player in player_list[gender]:
                 p = Player(player, gender, self)
                 self.players[gender].append(p)
 

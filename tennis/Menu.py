@@ -50,7 +50,7 @@ class Menu():
 
             ## TOURNAMENTS -------------------------------------------------------------------------------------------------------------------
             for tournament in self.game.seasons[season].get_tournaments():
-                Builder().add_menu("view_{}".format(season), tournament.get_name(), "t{}".format(tournament.get_name()))
+                Builder().add_menu("view_{}".format(season), "{}{}".format(tournament.get_name(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if tournament.is_complete() else Colours.FAIL + " (Incomplete)" + Colours.ENDC), "t{}".format(tournament.get_name()))
 
                 ## ROUNDS --------------------------------------------------------------------------------------------------------------------
                 for t_round in tournament.get_rounds():
@@ -63,6 +63,11 @@ class Menu():
                         ## CHECK GENDER IS AVAILABLE -----------------------------------------------------------------------------------------
                         if(gdr[1].is_available()):
                             Builder().add_func("t{}_r{}".format(tournament.get_name(), t_round.get_id()), "t{}_r{}_g{}".format(tournament.get_name(), t_round.get_id(), gdr[0]), partial(gdr[1].run))
+
+            ## DEBUG -------------------------------------------------------------------------------------------------------------------------
+            if(self.game.debug):
+                Builder().add_menu("view_{}".format(season), "Complete All Tournaments", "complete_{}".format(season))
+                Builder().add_func("view_{}".format(season), "complete_{}".format(season), partial(season_obj.force_complete))
 
             ## STATISTCAL ANALYSIS -----------------------------------------------------------------------------------------------------------
             Builder().add_menu("view_{}".format(season), "Statistical Analysis", "stats_{}".format(season))
