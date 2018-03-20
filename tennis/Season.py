@@ -135,11 +135,12 @@ class Season():
                 print("{0}2{1}. The percentage wins of a player".format(Colours.OKGREEN, Colours.ENDC))
                 print("{0}3{1}. Show the player(s) with the most wins".format(Colours.OKGREEN, Colours.ENDC))
                 print("{0}4{1}. Show the player(s) with the most losts".format(Colours.OKGREEN, Colours.ENDC))
+                print("{0}5{1}. Show the player(s) with the least amount of wins".format(Colours.OKGREEN, Colours.ENDC))
                 print("{0}b{1}. Back".format(Colours.FAIL, Colours.ENDC))
                 
                 selected_stat = input(">>> ")
                 if(selected_stat.isdigit()):
-                    if(int(selected_stat) > 0 and int(selected_stat) <= 4):
+                    if(int(selected_stat) > 0 and int(selected_stat) <= 5):
                         # Update Variable
                         selected_stat = int(selected_stat)
 
@@ -307,76 +308,173 @@ class Season():
                                         print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
                             else:
                                 return self.statistical_analysis(True, selected_gender)
-                        elif(selected_stat == 3 or selected_stat == 4):
-                            # Wins
+                        elif(selected_stat == 3 or selected_stat == 4 or selected_stat == 5):
+                            # Highest Wins
                             if(selected_stat == 3):
                                 # All Tournaments
                                 if(type(selected_tournament) is str):
-                                    print()
+                                    highest_wins = [ self.get_players(self.genders[selected_gender-1])[0] ]
                                     for p in self.get_players(self.genders[selected_gender-1]):
-                                        print(p.get_name(), p.get_wins())
-                                        ##TODO
-
-                                # Specific Tournament
-                                else:
-                                    print()
-                                    t = selected_tournament
-                                    round_wins = 0
+                                        for hp in highest_wins:
+                                            if(p.get_total_wins() > hp.get_total_wins()):
+                                                highest_wins = [ ]
+                                                highest_wins.append(p)
+                                            elif(p.get_total_wins() == hp.get_total_wins() and p not in highest_wins):
+                                                highest_wins.append(p)
                                     
-                                    print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
-                                    for r in t.get_rounds():
-                                        mg = r.get_gender(self.genders[selected_gender-1])[1]
-
-                                        if(not mg.is_complete()):
-                                            print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
-                                        else:
-                                            print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
-                                            for m in mg.get_matches():
-                                                if(m.get_winner() == plyr.get_name()):
-                                                    round_wins += 1
-
-                                    print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
-                            
-                            # Losses
-                            elif(selected_stat == 4):
-                                # All Tournaments
-                                if(type(selected_tournament) is str):
-                                    print()
                                     for t in self.get_tournaments():
                                         round_wins = 0
                                         print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
                                         for r in t.get_rounds():
                                             mg = r.get_gender(self.genders[selected_gender-1])[1]
-
                                             if(not mg.is_complete()):
                                                 print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
                                             else:
                                                 print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
-                                                for m in mg.get_matches():
-                                                    if(m.get_winner() == plyr.get_name()):
-                                                        round_wins += 1
-                                            
-                                        print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
+
+                                    # Print Player List
+                                    print(Colours.BOLD + "\nPlayers with the highest amount of wins:" + Colours.ENDC)
+                                    c = 0
+                                    for hp in highest_wins:
+                                        print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_total_wins():02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(highest_wins)) else " "))
+                                        c += 1
 
                                 # Specific Tournament
                                 else:
-                                    print()
+                                    highest_wins = [ self.get_players(self.genders[selected_gender-1])[0] ]
                                     t = selected_tournament
-                                    round_wins = 0
+                                    for p in self.get_players(self.genders[selected_gender-1]):
+                                        for hp in highest_wins:
+                                            if(p.get_wins(t.get_name()) > hp.get_wins(t.get_name())):
+                                                highest_wins = [ ]
+                                                highest_wins.append(p)
+                                            elif(p.get_wins(t.get_name()) == hp.get_wins(t.get_name()) and p not in highest_wins):
+                                                highest_wins.append(p)
                                     
-                                    print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
                                     for r in t.get_rounds():
                                         mg = r.get_gender(self.genders[selected_gender-1])[1]
-
                                         if(not mg.is_complete()):
                                             print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
                                         else:
                                             print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
-                                            for m in mg.get_matches():
-                                                if(m.get_winner() == plyr.get_name()):
-                                                    round_wins += 1
 
-                                    print("\tThe percentage wins for {2}{0}{4} is: {3}{1}%{4} ({5}/{6})".format(plyr.get_name(), (round_wins / self.game.settings['round_count']) * 100, Colours.OKBLUE, Colours.OKGREEN, Colours.ENDC, round_wins, self.game.settings['round_count']))
+                                    # Print Player List
+                                    print(Colours.BOLD + "\nPlayers with the highest amount of wins in " + Colours.OKBLUE + t.get_name() + Colours.ENDC + Colours.BOLD + ":" + Colours.ENDC)
+                                    c = 0
+                                    for hp in highest_wins:
+                                        print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_wins(t.get_name()):02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(highest_wins)) else " "))
+                                        c += 1
+
+                            # Highest Losts
+                            elif(selected_stat == 4):
+                                # All Tournaments
+                                if(type(selected_tournament) is str):
+                                    highest_losts = [ self.get_players(self.genders[selected_gender-1])[0] ]
+                                    for p in self.get_players(self.genders[selected_gender-1]):
+                                        for hp in highest_losts:
+                                            if(p.get_total_lost() > hp.get_total_lost()):
+                                                highest_losts = [ ]
+                                                highest_losts.append(p)
+                                            elif(p.get_total_lost() == hp.get_total_lost() and p not in highest_losts):
+                                                highest_losts.append(p)
+                                    
+                                    for t in self.get_tournaments():
+                                        round_wins = 0
+                                        print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                        for r in t.get_rounds():
+                                            mg = r.get_gender(self.genders[selected_gender-1])[1]
+                                            if(not mg.is_complete()):
+                                                print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                            else:
+                                                print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+
+                                    # Print Player List
+                                    print(Colours.BOLD + "\nPlayers with the highest amount of losts:" + Colours.ENDC)
+                                    c = 0
+                                    for hp in highest_losts:
+                                        print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_total_lost():02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(highest_losts)) else " "))
+                                        c += 1
+
+                                # Specific Tournament
+                                else:
+                                    highest_losts = [ self.get_players(self.genders[selected_gender-1])[0] ]
+                                    t = selected_tournament
+                                    for p in self.get_players(self.genders[selected_gender-1]):
+                                        for hp in highest_losts:
+                                            if(p.get_lost(t.get_name()) > hp.get_lost(t.get_name())):
+                                                highest_losts = [ ]
+                                                highest_losts.append(p)
+                                            elif(p.get_lost(t.get_name()) == hp.get_lost(t.get_name()) and p not in highest_losts):
+                                                highest_losts.append(p)
+                                    
+                                    for r in t.get_rounds():
+                                        mg = r.get_gender(self.genders[selected_gender-1])[1]
+                                        if(not mg.is_complete()):
+                                            print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                        else:
+                                            print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+
+                                    # Print Player List
+                                    print(Colours.BOLD + "\nPlayers with the highest amount of losts:" + Colours.ENDC)
+                                    c = 0
+                                    for hp in highest_losts:
+                                        print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_lost(t.get_name()):02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(highest_losts)) else " "))
+                                        c += 1
+                            # Least Wins
+                            elif(selected_stat == 5):
+                                # All Tournaments
+                                if(type(selected_tournament) is str):
+                                    least_wins = [ self.get_players(self.genders[selected_gender-1])[0] ]
+                                    for p in self.get_players(self.genders[selected_gender-1]):
+                                        for hp in least_wins:
+                                            if(p.get_total_wins() < hp.get_total_wins()):
+                                                least_wins = [ ]
+                                                least_wins.append(p)
+                                            elif(p.get_total_wins() == hp.get_total_wins() and p not in least_wins):
+                                                least_wins.append(p)
+                                    
+                                    for t in self.get_tournaments():
+                                        round_wins = 0
+                                        print("[{0}{1}{2}]:".format(Colours.OKBLUE, t.get_name(), Colours.ENDC))
+                                        for r in t.get_rounds():
+                                            mg = r.get_gender(self.genders[selected_gender-1])[1]
+                                            if(not mg.is_complete()):
+                                                print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                            else:
+                                                print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+
+                                    # Print Player List
+                                    print(Colours.BOLD + "\nPlayers with the least amount of wins:" + Colours.ENDC)
+                                    c = 0
+                                    for hp in least_wins:
+                                        print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_total_wins():02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(least_wins)) else " "))
+                                        c += 1
+
+                                # Specific Tournament
+                                else:
+                                    least_wins = [ self.get_players(self.genders[selected_gender-1])[0] ]
+                                    t = selected_tournament
+                                    for p in self.get_players(self.genders[selected_gender-1]):
+                                        for hp in least_wins:
+                                            if(p.get_wins(t.get_name()) < hp.get_wins(t.get_name())):
+                                                least_wins = [ ]
+                                                least_wins.append(p)
+                                            elif(p.get_wins(t.get_name()) == hp.get_wins(t.get_name()) and p not in least_wins):
+                                                least_wins.append(p)
+                                    
+                                    for r in t.get_rounds():
+                                        mg = r.get_gender(self.genders[selected_gender-1])[1]
+                                        if(not mg.is_complete()):
+                                            print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
+                                        else:
+                                            print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
+
+                                    # Print Player List
+                                    print(Colours.BOLD + "\nPlayers with the least amount of wins in " + Colours.OKBLUE + t.get_name() + Colours.ENDC + Colours.BOLD + ":" + Colours.ENDC)
+                                    c = 0
+                                    for hp in least_wins:
+                                        print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_wins(t.get_name()):02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(least_wins)) else " "))
+                                        c += 1
 
                         input("\n>>> Press <Return> to continue...")
                         return self.statistical_analysis(False, selected_gender)

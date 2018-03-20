@@ -66,9 +66,12 @@ class MatchGender():
 
         # Increase the wins of each winning player
         for m in self.get_matches():
-            for p in self.parent.parent.parent.get_players(self.gender):
-                if(m.get_winner() == p.get_name()):
-                    p.increment_wins()
+            if(m.get_winner() == m.player_one):
+                m.player_one_object.increment_wins(self.parent.parent.get_name())
+                m.player_two_object.increment_losts(self.parent.parent.get_name())
+            elif(m.get_winner() == m.player_two):
+                m.player_two_object.increment_wins(self.parent.parent.get_name())
+                m.player_one_object.increment_losts(self.parent.parent.get_name())
 
         # Are all the rounds complete?
         if(all_complete):
