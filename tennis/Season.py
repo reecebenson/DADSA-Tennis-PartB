@@ -8,6 +8,7 @@ from tennis.File import File
 from tennis.Player import Player
 from tennis import Tournament
 from tennis.Colours import Colours
+from tools.QuickSort import quick_sort_score as QuickSort
 
 class Season():
     # Variables
@@ -84,6 +85,8 @@ class Season():
                 p = Player(player, gender, self)
                 self.players[gender].append(p)
 
+    def get_genders(self):
+        return self.genders
 
     def get_players(self, gender):
         return self.players[gender] if gender in self.players else [ ]
@@ -502,13 +505,6 @@ class Season():
                 return "SKIP"
             else:
                 return self.statistical_analysis(True)
-        """
-        A - Number of wins for a player with a particular score
-        B - The percentage wins of a player
-        C - Show the player with most wins in the season
-        D - Show the player with most loses in the season
-        """
-        pass
 
     def validate_season(self):
         # Validate Tournaments
@@ -528,6 +524,82 @@ class Season():
 
             # Save Data
             # self.save()
+
+    def view_overall_ranking_points(self, selected_gender):
+        print(Colours.BOLD + "Overall Ranking Points for Season {}:".format(self.get_id()) + Colours.ENDC)
+
+        player_ranking_points = [ ]
+
+        for tournament in self.get_tournaments():
+            for t_round in tournament.get_rounds():
+                mg = t_round.get_gender(selected_gender)[1]
+                mg.finalise()
+
+                if(not mg.is_complete()):
+                    break
+
+                # Set the Player Ranking Points
+                for player_score in mg.complete_scores:
+                    player = player_score[0]
+                    score = float(player_score[1])
+                    bonus = float(player_score[2])
+
+                    player_exists = False
+                    i = 0
+                    for prp in player_ranking_points:
+                        if(prp['player'].get_name() == player):
+                            # Update Flag
+                            player_exists = True
+
+                            # Add Tournament
+                            if(not tournament.get_name() in prp['tournament']):
+                                player_ranking_points[i]['tournament'].update({ tournament.get_name(): 0 })
+
+                            # Update Score
+                            player_ranking_points[i]['tournament'].update({ tournament.get_name(): player_ranking_points[i]['tournament'][tournament.get_name()] + (score * bonus) })
+                        i += 1
+
+                    # Create Player
+                    if(not player_exists):
+                        player_ranking_points.append({
+                            "player": self.get_player(player, selected_gender),
+                            "tournament": { tournament.get_name(): (score * bonus) },
+                            "overall_score": 0
+                        })
+
+                # Add Round 5 - Tournament Difficulty Bonus
+                ##TODO: Make it so if the player hasn't reached the same point as the last seasons same tournament, they don't get the bonus tournament difficulty
+                if(t_round.get_id() == self.game.settings['round_count']):
+                    t_i = 0
+                    for p in player_ranking_points:
+                        ##TODO: Here ^^^^
+                        if(tournament.get_name() in player_ranking_points[t_i]['tournament']):
+                            player_ranking_points[t_i]['tournament'][tournament.get_name()] = player_ranking_points[t_i]['tournament'][tournament.get_name()] * tournament.get_difficulty()
+                        t_i += 1
+
+        # Finally add all their scores together
+        prp_i = 0
+        for player in player_ranking_points:
+            for tournament in self.get_tournaments():
+                if(tournament.get_name() in player_ranking_points[prp_i]['tournament']):
+                    player_ranking_points[prp_i]['overall_score'] += player_ranking_points[prp_i]['tournament'][tournament.get_name()]
+            prp_i += 1
+        
+        # Title
+        print("Viewing Ranking Points for Season {0}...".format(self.get_id()))
+        overall_place = 1
+        in_order = QuickSort(player_ranking_points, "overall_score")
+        for p in reversed(in_order):
+            # Variables
+            player = p['player']
+            score = p['overall_score']
+
+            # Print Data
+            print("#{0}: {1} — Score: {2:002.2f}".format(f"{overall_place:02}", player.get_name(), score))
+            overall_place += 1
+
+    def view_overall_prize_money(self, selected_gender):
+        pass
 
     def save(self):
         # Grab all data

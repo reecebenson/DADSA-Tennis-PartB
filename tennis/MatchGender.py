@@ -387,8 +387,6 @@ class MatchGender():
                 score = float(player_score[1])
                 bonus = float(player_score[2])
 
-                print("applying bonus of {} to {}".format(bonus, player))
-
                 # Find Player
                 player_found = False
                 i = 0

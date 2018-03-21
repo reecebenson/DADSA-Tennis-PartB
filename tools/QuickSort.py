@@ -8,4 +8,4 @@ def quick_sort_score(arr, attr="score"):
         piv = arr[0]
         gt  = [ e for e in arr[1:] if e[attr] > piv[attr] ]
         lt  = [ e for e in arr[1:] if e[attr] <= piv[attr] ]
-        return quick_sort_score(lt) + [piv] + quick_sort_score(gt)
+        return quick_sort_score(lt, attr) + [piv] + quick_sort_score(gt, attr)

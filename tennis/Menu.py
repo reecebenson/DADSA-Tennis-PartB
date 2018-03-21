@@ -66,6 +66,18 @@ class Menu():
                         if(gdr[1].is_available()):
                             Builder().add_func("s_{}_t{}_r{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id()), "s_{}_t{}_r{}_g{}".format(season_obj.get_id(), tournament.get_name(), t_round.get_id(), gdr[0]), partial(gdr[1].run))
 
+            ## OVERALL RANKINGS --------------------------------------------------------------------------------------------------------------
+            Builder().add_menu("view_{}".format(season), "View Overall Data", "overall_{}".format(season))
+            Builder().add_menu("overall_{}".format(season), "View Overall Ranking Points", "overall_rp_{}".format(season))
+            Builder().add_menu("overall_{}".format(season), "View Overall Prize Money", "overall_pm_{}".format(season))
+
+            ## OVERALL RANKINGS GENDER -------------------------------------------------------------------------------------------------------
+            for or_gender in season_obj.get_genders():
+                Builder().add_menu("overall_rp_{}".format(season), or_gender, "overall_rp_{}_{}".format(season, or_gender))
+                Builder().add_menu("overall_pm_{}".format(season), or_gender, "overall_pm_{}_{}".format(season, or_gender))
+                Builder().add_func("overall_rp_{}".format(season), "overall_rp_{}_{}".format(season, or_gender), partial(season_obj.view_overall_ranking_points, or_gender))
+                Builder().add_func("overall_pm_{}".format(season), "overall_pm_{}_{}".format(season, or_gender), partial(season_obj.view_overall_prize_money, or_gender))
+
             ## DEBUG -------------------------------------------------------------------------------------------------------------------------
             if(self.game.debug):
                 Builder().add_menu("view_{}".format(season), "Complete All Tournaments", "complete_{}".format(season))
