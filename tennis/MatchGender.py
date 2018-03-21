@@ -207,7 +207,7 @@ class MatchGender():
 
         # Get Allocation Score
         if(self.parent.get_id() == self.game.settings['round_count']):
-            score_to_add = ranking_points[self.parent.get_id() - 2]
+            score_to_add = ranking_points[self.parent.get_id() - 1]
         else:
             score_to_add = ranking_points[self.parent.get_id() - 1]
 
@@ -225,9 +225,15 @@ class MatchGender():
             match_add_score = int(score_to_add)
 
             print("Winner: {}, score to set: {} ({})".format(match.get_winner(), match_add_score, "No Bonus" if bonus == 1 else "Bonus"))
+            
             # TODO make it run, make it right, make it wrong, make it the best you can.
-            self.complete_scores.append((match.get_player_one()[0], match_add_score if match.get_winner() == match.get_player_one()[0] else 0, 1 if self.parent.get_id() >= (self.game.settings['round_count']-1) else bonus))
-            self.complete_scores.append((match.get_player_two()[0], match_add_score if match.get_winner() == match.get_player_two()[0] else 0, 1 if self.parent.get_id() >= (self.game.settings['round_count']-1) else bonus))
+            if(self.parent.get_id() == self.game.settings['round_count']):
+                self.complete_scores.append((match.get_player_winner()[0], match_add_score, 1 if self.parent.get_id() >= self.game.settings['round_count']-1 and self.parent.get_id() != self.game.settings['round_count'] else bonus))
+                self.complete_scores.append((match.get_player_loser()[0], ranking_points[self.parent.get_id() - 2], 1))
+
+            elif(self.parent.get_id() != self.game.settings['round_count'] - 1):
+                self.complete_scores.append((match.get_player_winner()[0], match_add_score if match.get_winner() == match.get_player_winner()[0] else 0, 1 if self.parent.get_id() >= self.game.settings['round_count']-1 and self.parent.get_id() != self.game.settings['round_count'] else bonus))
+                self.complete_scores.append((match.get_player_loser()[0], match_add_score if match.get_winner() == match.get_player_loser()[0] else 0, 1 if self.parent.get_id() >= self.game.settings['round_count']-1 and self.parent.get_id() != self.game.settings['round_count'] else bonus))
         pass
 
     def run(self, error=False):

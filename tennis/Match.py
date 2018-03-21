@@ -68,6 +68,12 @@ class Match():
     def get_winner(self):
         return self.winner
 
+    def get_player_winner(self):
+        return self.get_player_one() if self.get_player_one()[0] == self.get_winner() else self.get_player_two()
+
+    def get_player_loser(self):
+        return self.get_player_one() if self.get_player_one()[0] != self.get_winner() else self.get_player_two()
+
     def get_match_text(self, full=False):
         return "{5}[{6}{0}{7}] {1} - {2} [{6}{3}{7}] -- Winner: {8}{4}{7}".format(self.get_player_one()[0], self.get_player_one()[1], self.get_player_two()[1], self.get_player_two()[0], self.get_winner(), "" if not full else "{0}, Round {1} -- ".format(self.parent.parent.parent.get_name(), self.parent.parent.get_id()), Colours.OKBLUE, Colours.ENDC, Colours.OKGREEN)
     
