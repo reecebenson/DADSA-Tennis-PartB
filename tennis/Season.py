@@ -231,7 +231,7 @@ class Season():
                                                     mg = r.get_gender(self.genders[selected_gender-1])[1]
 
                                                     if(not mg.is_complete()):
-                                                        print(Colours.GRAY + "\t(Round {0} is incomplete, so data has not been pulled from here)".format(r.get_id()) + Colours.ENDC)
+                                                        print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
                                                     else:
                                                         for m in mg.get_matches():
                                                             plyr_one = m.get_player_one()
@@ -255,8 +255,9 @@ class Season():
                                                 mg = r.get_gender(self.genders[selected_gender-1])[1]
 
                                                 if(not mg.is_complete()):
-                                                    print(Colours.GRAY + "\t(Round {0} is incomplete, so data has not been pulled from here)".format(r.get_id()) + Colours.ENDC)
+                                                    print(Colours.GRAY + "\t(Round {0} is {1}incomplete{2}, no data to pull here!)".format(r.get_id(), Colours.FAIL, Colours.GRAY) + Colours.ENDC)
                                                 else:
+                                                    print(Colours.GRAY + "\t(Round {0} is {1}complete{2}, data has been retrieved)".format(r.get_id(), Colours.OKGREEN, Colours.GRAY) + Colours.ENDC)
                                                     for m in mg.get_matches():
                                                         plyr_one = m.get_player_one()
                                                         plyr_two = m.get_player_two()

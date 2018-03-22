@@ -511,15 +511,18 @@ class MatchGender():
         # First Round
         if(len(self.pop_player_list) == 0 and self.parent.get_id() == 1):
             self.pop_player_list = [ p.get_name() for p in self.parent.parent.parent.get_players(self.gender) ]
-            print("set list to all players")
-            input("...")
+
+            if(self.game.debug):
+                print("set list to all players")
+                input("...")
         elif(len(self.pop_player_list) == 0 and self.parent.get_id() > 1):
             self.pop_player_list = self.parent.parent.get_round(self.parent.get_id() - 1).get_gender(self.gender)[1].get_winners()
-            print("set list to parent players")
-            input("...")
+
+            if(self.game.debug):
+                print("set list to parent players")
+                input("...")
         else:
-            print("Something is majorly fucked!")
-            input("...")
+            self.pop_player_list = self.get_players()
 
         self.inputted_matches = [ ]
 

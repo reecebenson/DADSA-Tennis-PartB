@@ -22,7 +22,7 @@ class Game():
     game = None
     menu = None
     parent = None
-    debug = True
+    debug = False
     seasons = None
     settings = None
 

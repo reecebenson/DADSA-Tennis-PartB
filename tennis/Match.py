@@ -98,7 +98,7 @@ class Match():
 
         # Get Score Response
         if(scores in bonuses):
-            print("\tBonus Found! {0} for {1}".format(bonuses[scores][0], bonuses[scores][1]))
+            print(" - Bonus Found! {0} for Player {1}".format(bonuses[scores][0], bonuses[scores][1].title()))
 
     def get_match_as_json(self):
         return { self.player_one: self.player_one_score, self.player_two: self.player_two_score, "winner": self.winner }
@@ -132,7 +132,7 @@ class Match():
         self.invalid_reason = None
 
         # Clear Screen
-        if(not self.game.debug):
+        if(self.game.debug):
             print("Validating Match:", self.get_match_text(True))
             
         # Validate Winner Tag
