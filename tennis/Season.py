@@ -3,7 +3,6 @@
  # Created by Reece Benson (16021424)
 """
 import json
-import cProfile
 from tennis.File import File
 from tennis.Player import Player
 from tennis import Tournament
@@ -97,13 +96,6 @@ class Season():
                 if(player.get_name() == name):
                     return player
         return None
-
-    def list_players(self):
-        print("Season: {}\n".format(self.get_name()))
-        for gender in self.players:
-            print("Gender: {}, count: {}".format(gender, len(self.players[gender])))
-            print("{0}\n".format(", ".join([ player.get_name() for player in self.players[gender] ])))
-            print("{0}\n".format([ player for player in self.players[gender] ]))
 
     def statistical_analysis(self, error=False, gender=None):
         # Clear Screen
@@ -374,7 +366,6 @@ class Season():
                                     for hp in highest_wins:
                                         print("[{0}{1}{2}] {3}{4}{2}".format(Colours.OKGREEN, f"{hp.get_wins(t.get_name()):02}", Colours.ENDC, Colours.BOLD, hp.get_name()), end='{}'.format("\n" if (((c+1) % 4) == 0 or c+1 == len(highest_wins)) else " "))
                                         c += 1
-
                             # Highest Losts
                             elif(selected_stat == 4):
                                 # All Tournaments
@@ -526,8 +517,13 @@ class Season():
             # self.save()
 
     def view_overall_ranking_points(self, selected_gender):
+        # Clear Screen
+        self.game.clear_screen()
+
+        # Title
         print(Colours.BOLD + "Overall Ranking Points for Season {}:".format(self.get_id()) + Colours.ENDC)
 
+        # Ranking Points
         player_ranking_points = [ ]
 
         for tournament in self.get_tournaments():
@@ -544,6 +540,24 @@ class Season():
                     score = float(player_score[1])
                     bonus = float(player_score[2])
 
+                    # Check that the Player has reached the same point (if season is not 1)
+                    tournament_difficulty = t_round.parent.get_difficulty()
+                    if(t_round.parent.parent.get_id() > 1):
+                        previous_season = self.game.get_season("season_{}".format(t_round.parent.parent.get_id() - 1))
+                        previous_season_mg = previous_season.get_tournament(t_round.parent.get_name()).get_round(t_round.get_id()).get_gender(self.gender)[1]
+                        previous_season_plyr = previous_season.get_player(player, self.gender)
+                        current_season_plyr = self.game.get_season("season_{}".format(t_round.parent.parent.get_id())).get_player(player, self.gender)
+
+                        if((player in previous_season_mg.get_winners() or player in mg.get_winners()) and current_season_plyr.get_wins(t_round.parent.get_name()) >= t_round.get_id()):
+                            if(self.game.debug):
+                                print("{} received the tournament bonus of {}, their current win count is {} and old win count is {}".format(player, tournament_difficulty, current_season_plyr.get_wins(t_round.parent.get_name()), previous_season_plyr.get_wins(t_round.parent.get_name())))
+                            pass
+                        else:
+                            tournament_difficulty = 1 # So we don't multiply by zero
+
+                            if(self.game.debug):
+                                print("{} tournament bonus changed to {} as they didn't succeed the round, their current win count is {} and old win count is {}".format(player, tournament_difficulty, current_season_plyr.get_wins(t_round.parent.get_name()), previous_season_plyr.get_wins(t_round.parent.get_name())))
+
                     player_exists = False
                     i = 0
                     for prp in player_ranking_points:
@@ -556,26 +570,16 @@ class Season():
                                 player_ranking_points[i]['tournament'].update({ tournament.get_name(): 0 })
 
                             # Update Score
-                            player_ranking_points[i]['tournament'].update({ tournament.get_name(): player_ranking_points[i]['tournament'][tournament.get_name()] + (score * bonus) })
+                            player_ranking_points[i]['tournament'].update({ tournament.get_name(): player_ranking_points[i]['tournament'][tournament.get_name()] + ((score * bonus) * tournament_difficulty) })
                         i += 1
 
                     # Create Player
                     if(not player_exists):
                         player_ranking_points.append({
                             "player": self.get_player(player, selected_gender),
-                            "tournament": { tournament.get_name(): (score * bonus) },
+                            "tournament": { tournament.get_name(): ((score * bonus) * tournament_difficulty) },
                             "overall_score": 0
                         })
-
-                # Add Round 5 - Tournament Difficulty Bonus
-                ##TODO: Make it so if the player hasn't reached the same point as the last seasons same tournament, they don't get the bonus tournament difficulty
-                if(t_round.get_id() == self.game.settings['round_count']):
-                    t_i = 0
-                    for p in player_ranking_points:
-                        ##TODO: Here ^^^^
-                        if(tournament.get_name() in player_ranking_points[t_i]['tournament']):
-                            player_ranking_points[t_i]['tournament'][tournament.get_name()] = player_ranking_points[t_i]['tournament'][tournament.get_name()] * tournament.get_difficulty()
-                        t_i += 1
 
         # Finally add all their scores together
         prp_i = 0
@@ -595,11 +599,46 @@ class Season():
             score = p['overall_score']
 
             # Print Data
-            print("#{0}: {1} — Score: {2:002.2f}".format(f"{overall_place:02}", player.get_name(), score))
+            print("#{0}: {4}{1}{3} — Score: {5}{2:002.2f}{3}".format(f"{overall_place:02}", player.get_name(), score, Colours.ENDC, Colours.OKBLUE, Colours.OKGREEN if (overall_place <= len(in_order)/2) else Colours.FAIL))
             overall_place += 1
 
     def view_overall_prize_money(self, selected_gender):
-        pass
+        # Clear Screen
+        self.game.clear_screen()
+
+        # Title
+        print(Colours.BOLD + "Overall Prize Money for Season {}:".format(self.get_id()) + Colours.ENDC)
+
+        player_money = [ ]
+
+        for season_name in self.game.get_seasons():
+            season = self.game.get_season(season_name)
+            for player in season.get_players(selected_gender):
+                for tournament in season.get_tournaments():
+                    i = 0
+                    player_found = False
+                    for money_player in player_money:
+                        if(player_money[i]['player'].get_name() == player.get_name()):
+                            player_money[i]['money'] += player.get_money(tournament.get_name())
+                            player_found = True
+                            break
+                        i += 1
+                    
+                    if(not player_found):
+                        player_money.append({ "player": player, "money": player.get_money(tournament.get_name()) })
+
+        # Title
+        print("Viewing Prize Money for Season {0}...".format(self.get_id()))
+        overall_place = 1
+        in_order = QuickSort(player_money, "money")
+        for p in reversed(in_order):
+            # Variables
+            player = p['player']
+            money = p['money']
+
+            # Print Data
+            print("#{0}: {4}{1}{3} — Prize Money: {5}£{2:002.2f}{3}".format(f"{overall_place:02}", player.get_name(), money, Colours.ENDC, Colours.OKBLUE, Colours.OKGREEN if (money > 0) else Colours.FAIL))
+            overall_place += 1
 
     def save(self):
         # Grab all data

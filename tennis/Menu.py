@@ -43,13 +43,6 @@ class Menu():
             if(not season_obj.is_available()):
                 continue
 
-            ## DEBUG -------------------------------------------------------------------------------------------------------------------------
-            if(menu_debug):
-                Builder().add_menu("debug", "List Season {} Players".format(season_id), "debug_list_players_s{}".format(season_id))
-                Builder().add_func("debug", "debug_list_players_s{}".format(season_id), partial(season_obj.list_players))
-                Builder().add_menu("debug", "List Seasons".format(season_id), "debug_list_seasons_{}".format(season_id))
-                Builder().add_func("debug", "debug_list_seasons_{}".format(season_id), partial(self.game.list_seasons))
-
             ## TOURNAMENTS -------------------------------------------------------------------------------------------------------------------
             for tournament in self.game.seasons[season].get_tournaments():
                 Builder().add_menu("view_{}".format(season), "{}{}".format(tournament.get_name(), Colours.OKGREEN + " (Complete)" + Colours.ENDC if tournament.is_complete() else Colours.FAIL + " (Incomplete)" + Colours.ENDC), "s{}_t{}".format(season_obj.get_id(), tournament.get_name()))
@@ -73,8 +66,8 @@ class Menu():
 
             ## OVERALL RANKINGS GENDER -------------------------------------------------------------------------------------------------------
             for or_gender in season_obj.get_genders():
-                Builder().add_menu("overall_rp_{}".format(season), or_gender, "overall_rp_{}_{}".format(season, or_gender))
-                Builder().add_menu("overall_pm_{}".format(season), or_gender, "overall_pm_{}_{}".format(season, or_gender))
+                Builder().add_menu("overall_rp_{}".format(season), or_gender.title(), "overall_rp_{}_{}".format(season, or_gender))
+                Builder().add_menu("overall_pm_{}".format(season), or_gender.title(), "overall_pm_{}_{}".format(season, or_gender))
                 Builder().add_func("overall_rp_{}".format(season), "overall_rp_{}_{}".format(season, or_gender), partial(season_obj.view_overall_ranking_points, or_gender))
                 Builder().add_func("overall_pm_{}".format(season), "overall_pm_{}_{}".format(season, or_gender), partial(season_obj.view_overall_prize_money, or_gender))
 

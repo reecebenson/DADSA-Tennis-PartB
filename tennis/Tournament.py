@@ -3,6 +3,7 @@
  # Created by Reece Benson (16021424)
 """
 from tennis import Round
+from tennis.Colours import Colours
 
 class Tournament():
     # Variables
@@ -71,7 +72,7 @@ class Tournament():
 
         if(all_complete):
             # Open up the next season
-            print("All tournaments are now complete! Start opening season {}".format(self.parent.get_id() + 1))
+            print("\n\nAll tournaments are now " + Colours.OKGREEN + "complete" + Colours.ENDC + "! Start opening season {}".format(self.parent.get_id() + 1))
             input(">>> Press <Return> to continue...")
 
             # Create New Season

@@ -22,7 +22,7 @@ class Game():
     game = None
     menu = None
     parent = None
-    debug = False
+    debug = True
     seasons = None
     settings = None
 
@@ -90,16 +90,6 @@ class Game():
 
         # Reload Menu
         Builder().reload_menu()
-
-    def list_seasons(self):
-        print(self.seasons)
-
-        for s in self.seasons:
-            season_obj = self.seasons[s]
-
-            print(season_obj, season_obj.get_id())
-
-        input("...")
 
     def get_season(self, season_name):
         return self.seasons[season_name] if season_name in self.seasons else None
