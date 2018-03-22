@@ -431,6 +431,10 @@ class MatchGender():
             if(not mg.is_complete() or self.parent.get_id() < t_round.get_id()):
                 break
 
+            # Debug
+            if(self.game.debug):
+                print("[{},{}]:".format(t_round.parent.get_name(), t_round.get_name()))
+
             # Set the scores
             for player_score in mg.complete_scores:
                 player = player_score[0]
@@ -439,34 +443,38 @@ class MatchGender():
 
                 # Check that the Player has reached the same point (if season is not 1)
                 tournament_difficulty = t_round.parent.get_difficulty()
+                set_score = None
                 if(t_round.parent.parent.get_id() > 1):
-                    previous_season = self.game.get_season("season_{}".format(t_round.parent.parent.get_id() - 1))
-                    previous_season_mg = previous_season.get_tournament(t_round.parent.get_name()).get_round(t_round.get_id()).get_gender(self.gender)[1]
-                    previous_season_plyr = previous_season.get_player(player, self.gender)
-                    current_season_plyr = self.game.get_season("season_{}".format(t_round.parent.parent.get_id())).get_player(player, self.gender)
-
-                    if((player in previous_season_mg.get_winners() or player in mg.get_winners()) and current_season_plyr.get_wins(t_round.parent.get_name()) >= t_round.get_id()):
-                        if(self.game.debug):
-                            print("{} received the tournament bonus of {}, their current win count is {} and old win count is {}".format(player, tournament_difficulty, current_season_plyr.get_wins(t_round.parent.get_name()), previous_season_plyr.get_wins(t_round.parent.get_name())))
-                        pass
-                    else:
-                        tournament_difficulty = 1 # So we don't multiply by zero
-
-                        if(self.game.debug):
-                            print("{} tournament bonus changed to {} as they didn't succeed the round, their current win count is {} and old win count is {}".format(player, tournament_difficulty, current_season_plyr.get_wins(t_round.parent.get_name()), previous_season_plyr.get_wins(t_round.parent.get_name())))
+                    tournament_difficulty = 1
 
                 # Find Player
                 player_found = False
                 i = 0
                 for p in player_scores:
                     if(p['player'].get_name() == player):
-                        player_scores[i] = { "score": p['score'] + ((score * bonus) * tournament_difficulty), "player": self.parent.parent.parent.get_player(player, self.gender) }
+                        player_scores[i] = { "score": (p['score'] + ((score * bonus) * tournament_difficulty)), "player": self.parent.parent.parent.get_player(player, self.gender) }
                         player_found = True
                     i += 1
 
                 # Add Player
                 if(not player_found):
                     player_scores.append({ "score": ((score * bonus) * tournament_difficulty), "player": self.parent.parent.parent.get_player(player, self.gender) })
+
+        # Update Player Tournament Difficulty for Season 2 and above
+        if(self.parent.parent.parent.get_id() > 1):
+            if(self.parent.get_id() == self.game.settings['round_count']):
+                i = 0
+                for p in player_scores:
+                    previous_season = self.game.get_season("season_{}".format(t_round.parent.parent.get_id() - 1))
+                    previous_season_mg = previous_season.get_tournament(t_round.parent.get_name()).get_round(t_round.get_id()).get_gender(self.gender)[1]
+                    previous_season_plyr = previous_season.get_player(p['player'].get_name(), self.gender)
+                    current_season_plyr = self.game.get_season("season_{}".format(t_round.parent.parent.get_id())).get_player(p['player'].get_name(), self.gender)
+
+                    if(p['player'].get_wins(self.parent.parent.get_name()) >= previous_season_plyr.get_wins(self.parent.parent.get_name())):
+                        player_scores[i] = { "score": (p['score'] * self.parent.parent.get_difficulty()), "player": p['player'] }
+                        if(self.game.debug):
+                            print("updated difficulty for {}".format(p['player'].get_name()))
+                    i += 1
 
         # Title
         print("Viewing Ranking Points for Season {0}, Tournament {1}, Round {2} of {3}s...".format(self.parent.parent.parent.get_id(), self.parent.parent.get_name(), self.parent.get_id(), self.get_gender()))
@@ -806,7 +814,7 @@ class MatchGender():
 
             # Ask for Player Scores
             print("\nPlease enter the scores for {} vs. {}: (Example: \"{}-0\")".format(player_names[0], player_names[1], self.game.settings["score_limit"][self.gender]))
-            resp = input(">>> ") or "3-0"
+            resp = input(">>> ") or "3-2"
             player_scores = resp.replace(" ", "").split("-")
 
             # Validate Scores as Integers/Digits
